@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EnergiaOcto Admin">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0A1628">
+<title>EnergiaOcto Admin ⚡</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{
+  height:100%;
+  height:-webkit-fill-available;
+  background:#000;
+  overflow:hidden;
+}
+body{
+  font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;
+  background:#F2F4F8;color:#0F1923;
+  /* Usa fill-available para cobrir 100% da tela no iPhone */
+  min-height:100vh;
+  min-height:-webkit-fill-available;
+  height:100dvh;
+  max-height:100dvh;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  /* Safe area para Dynamic Island e barra home */
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  user-select:none;-webkit-user-select:none;
+  /* Evita bounce scroll no iOS */
+  position:fixed;
+  width:100%;
+}
+
+/* ══════════════════════════════════════════
+   SPLASH — EnergiaOcto (fiel ao design)
+══════════════════════════════════════════ */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  /* Cobre safe-area também */
+  top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 90% 80% at 50% 40%, #0D1F5C 0%, #08122E 55%, #060E20 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease,transform .6s ease;
+  /* Botão que cobre tudo — iOS respeita user gesture em button */
+  border:none;outline:none;padding:0;margin:0;
+  width:100%;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+
+/* Anéis pulsantes ao redor do ícone */
+.sp-rings{
+  position:absolute;
+  width:140px;height:140px;
+  pointer-events:none;
+}
+.sp-ring{
+  position:absolute;border-radius:50%;
+  border:1.5px solid rgba(100,140,255,.18);
+  animation:ringOut 3s ease-in-out infinite;
+}
+.sp-ring:nth-child(1){inset:-16px;animation-delay:0s}
+.sp-ring:nth-child(2){inset:-32px;animation-delay:.5s;border-color:rgba(100,140,255,.10)}
+.sp-ring:nth-child(3){inset:-50px;animation-delay:1s;border-color:rgba(100,140,255,.05)}
+@keyframes ringOut{
+  0%{transform:scale(.88);opacity:0}
+  30%{opacity:1}
+  100%{transform:scale(1.12);opacity:0}
+}
+
+/* Wrapper do ícone */
+.sp-icon-wrap{
+  position:relative;
+  width:140px;height:140px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:36px;
+  animation:iconPop .7s cubic-bezier(.34,1.56,.64,1) .1s both;
+}
+@keyframes iconPop{
+  from{opacity:0;transform:scale(.35) translateY(18px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* Cartão do ícone — igual ao da imagem */
+.sp-icon-card{
+  width:118px;height:118px;
+  border-radius:28px;
+  background:linear-gradient(160deg,#1A2B5E 0%,#111D45 100%);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.6),
+    0 8px 24px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+/* Gradiente de luz no canto superior direito do card */
+.sp-icon-card::before{
+  content:'';position:absolute;
+  top:-20px;right:-20px;
+  width:80px;height:80px;
+  background:radial-gradient(circle,rgba(90,120,255,.25),transparent 70%);
+}
+
+/* SVG do Octo — laranja/rosa como na imagem */
+.sp-octo-svg{
+  width:80px;height:80px;
+  position:relative;z-index:1;
+  filter:drop-shadow(0 4px 16px rgba(255,140,80,.4));
+  animation:octoFloat 3s ease-in-out infinite .8s;
+}
+@keyframes octoFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+
+/* Sombra embaixo do card */
+.sp-icon-shadow{
+  position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);
+  width:70px;height:10px;
+  background:radial-gradient(ellipse,rgba(28,80,255,.35),transparent 70%);
+  filter:blur(6px);
+}
+
+/* Textos */
+.sp-title{
+  font-size:42px;font-weight:900;letter-spacing:-1.5px;
+  color:#fff;line-height:1;
+  animation:spFade .5s ease .65s both;
+  display:flex;align-items:center;gap:10px;
+}
+.sp-title-octo{color:#3B82F6}
+.sp-title-bolt{font-size:36px;animation:boltPulse 1.5s ease-in-out infinite .9s}
+@keyframes boltPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.92)}}
+.sp-sub{
+  font-size:15px;font-weight:400;color:rgba(255,255,255,.45);
+  margin-top:10px;letter-spacing:.2px;
+  animation:spFade .5s ease .8s both;
+}
+@keyframes spFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Barra de progresso */
+.sp-bar-wrap{
+  width:80px;height:3px;
+  background:rgba(255,255,255,.08);border-radius:2px;
+  margin-top:52px;overflow:hidden;
+  animation:spFade .3s ease .95s both;
+}
+.sp-bar-fill{
+  height:100%;width:0;border-radius:2px;
+  background:linear-gradient(90deg,#2563EB,#60A5FA);
+  animation:barLoad 1.6s 1s ease forwards;
+}
+@keyframes barLoad{to{width:100%}}
+
+/* Dica de toque (aparece após 0.8s) */
+.sp-tap-hint{
+  position:absolute;bottom:calc(32px + env(safe-area-inset-bottom));
+  font-size:12px;color:rgba(255,255,255,.25);font-weight:500;
+  letter-spacing:.4px;
+  animation:spFade .4s ease 1.2s both;
+}
+/* Versão */
+.sp-version{
+  position:absolute;top:calc(18px + env(safe-area-inset-top));right:20px;
+  font-size:11px;color:rgba(255,255,255,.18);font-weight:600;letter-spacing:.5px;
+}
+
+/* ══════════════════════════════════════════
+   MODAL DE SENHA (aparece ao clicar Admin)
+══════════════════════════════════════════ */
+#authModal{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(6,13,26,.85);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:flex;align-items:flex-end;
+  animation:mfade .25s ease;
+}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+.auth-sheet{
+  background:#fff;
+  border-radius:28px 28px 0 0;
+  padding:8px 24px calc(28px + env(safe-area-inset-bottom));
+  width:100%;
+  animation:mup .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes mup{from{transform:translateY(100%)}to{transform:none}}
+.auth-handle{width:40px;height:4px;background:#E4E8F0;border-radius:2px;margin:12px auto 24px}
+.auth-icon{font-size:44px;text-align:center;margin-bottom:10px}
+.auth-title{font-size:22px;font-weight:900;color:#0F1923;text-align:center;letter-spacing:-.5px;margin-bottom:4px}
+.auth-sub{font-size:13px;color:#9BA8B5;text-align:center;margin-bottom:24px;line-height:1.5}
+.auth-pw-wrap{position:relative;margin-bottom:10px}
+.auth-pw-inp{
+  width:100%;padding:16px 52px 16px 18px;
+  background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:16px;
+  font-size:22px;letter-spacing:4px;text-align:center;
+  outline:none;font-family:inherit;color:#0F1923;
+  -webkit-appearance:none;transition:border-color .2s,box-shadow .2s;
+}
+.auth-pw-inp:focus{border-color:#1C6EFF;box-shadow:0 0 0 3px rgba(28,110,255,.1)}
+.auth-pw-eye{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:22px;color:#9BA8B5;padding:4px;
+}
+.auth-err{
+  font-size:13px;color:#EF4444;font-weight:700;
+  text-align:center;min-height:20px;margin-bottom:8px;
+}
+.auth-shake{animation:ashake .35s}
+@keyframes ashake{0%,100%{transform:none}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.auth-att{font-size:12px;color:#F59E0B;font-weight:700;text-align:center;margin-bottom:12px;min-height:16px}
+.auth-btn{
+  width:100%;padding:17px;border-radius:16px;border:none;
+  font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;
+  background:linear-gradient(135deg,#1344C8,#1C6EFF);
+  color:#fff;box-shadow:0 6px 24px rgba(28,110,255,.4);
+  transition:transform .15s;
+}
+.auth-btn:active{transform:scale(.97)}
+.auth-cancel{
+  width:100%;padding:13px;border:none;background:none;
+  font-size:15px;font-weight:700;color:#9BA8B5;cursor:pointer;
+  font-family:inherit;margin-top:8px;border-radius:12px;
+  transition:background .2s;
+}
+.auth-cancel:active{background:#F2F4F8}
+
+/* ══════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════ */
+#app{display:flex;flex-direction:column;height:100%;max-height:100%;overflow:hidden;position:relative}
+
+/* ── TOPBAR ── */
+.topbar{
+  flex-shrink:0;
+  background:linear-gradient(135deg,#060D1A 0%,#0A1628 60%,#0D2158 100%);
+  padding:14px 16px 14px;
+  display:flex;align-items:center;gap:12px;
+}
+.topbar-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.topbar-octo{
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+}
+.topbar-name{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.4px}
+.topbar-name em{color:#1C6EFF;font-style:normal}
+.topbar-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px;font-weight:500}
+
+/* Botão Admin na topbar */
+.btn-admin{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 14px;border-radius:50px;border:none;cursor:pointer;
+  font-family:inherit;font-size:13px;font-weight:800;
+  transition:all .2s;flex-shrink:0;
+}
+.btn-admin.locked{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15)}
+.btn-admin.locked:active{background:rgba(255,255,255,.18)}
+.btn-admin.unlocked{background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.4)}
+.btn-admin.unlocked:active{transform:scale(.95)}
+.btn-admin-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.btn-admin.locked .btn-admin-dot{background:rgba(255,255,255,.4)}
+.btn-admin.unlocked .btn-admin-dot{background:#fff;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}50%{box-shadow:0 0 0 5px rgba(255,255,255,0)}}
+
+/* ── TABS ── */
+.tabs{
+  flex-shrink:0;background:#fff;border-bottom:1.5px solid #EEF2F7;
+  display:flex;padding:0 4px;overflow-x:auto;scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:1;min-width:58px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:10px 4px;border:none;background:none;cursor:pointer;font-family:inherit;
+  border-bottom:2.5px solid transparent;transition:all .2s;
+}
+.tab.on{border-bottom-color:#1C6EFF}
+.tab-icon{font-size:18px;line-height:1}
+.tab-lbl{font-size:10px;font-weight:700;color:#9BA8B5;letter-spacing:.1px}
+.tab.on .tab-lbl{color:#1C6EFF}
+/* Cadeado nas abas protegidas quando bloqueado */
+.tab-lock{font-size:8px;position:absolute;top:8px;right:6px;opacity:.5}
+
+/* ── BODY ── */
+.tab-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:16px;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom));
+}
+.tab-body::-webkit-scrollbar{display:none}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%) translateY(16px);
+  background:#0F1923;color:#fff;padding:11px 22px;border-radius:50px;
+  font-size:13.5px;font-weight:600;opacity:0;transition:all .3s;
+  white-space:nowrap;pointer-events:none;z-index:999;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── MODAL GENÉRICO ── */
+.mover{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  z-index:500;display:flex;align-items:flex-end;animation:mfade .2s;
+}
+.mbox{
+  background:#fff;border-radius:26px 26px 0 0;
+  padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+  width:100%;max-height:84dvh;overflow-y:auto;
+  animation:mup .3s cubic-bezier(.34,1.56,.64,1);
+}
+.mbox::-webkit-scrollbar{display:none}
+.m-handle{width:40px;height:4px;background:#E4E8F0;border-radius:2px;margin:0 auto 18px}
+.m-title{font-size:20px;font-weight:900;color:#0F1923;margin-bottom:16px;letter-spacing:-.4px}
+.m-row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid #F0F4F8;gap:12px}
+.m-row:last-of-type{border-bottom:none}
+.m-lbl{font-size:13px;color:#6B7A8D;flex-shrink:0}
+.m-val{font-size:13.5px;font-weight:800;color:#0F1923;text-align:right}
+
+/* ── UTILS ── */
+.card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05)}
+.sec{margin-bottom:20px}
+.sec-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#9BA8B5;margin-bottom:10px;padding-left:4px}
+.acard{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05)}
+.arow{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #F0F4F8;gap:13px;transition:background .12s}
+.arow:last-child{border-bottom:none}
+.arow.tap{cursor:pointer}.arow.tap:active{background:#F7F9FC}
+.arow-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.arow-info{flex:1;min-width:0}
+.arow-title{font-size:14.5px;font-weight:700;color:#0F1923}
+.arow-sub{font-size:12px;color:#9BA8B5;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arr{color:#C8D0DA;font-size:18px;flex-shrink:0}
+.tog{width:48px;height:27px;border-radius:14px;border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
+.tog.on{background:#1C6EFF}.tog.off{background:#D1D9E6}
+.tog::after{content:'';position:absolute;top:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.tog.on::after{left:24px}.tog.off::after{left:3px}
+.field-wrap{padding:8px 16px 12px;background:#F7F9FC}
+.field-inner{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #E8EDF4;border-radius:12px;padding:10px 12px;transition:border-color .2s}
+.field-inner:focus-within{border-color:#1C6EFF}
+.field-inp{flex:1;border:none;background:none;font-size:15px;font-weight:700;color:#0F1923;font-family:inherit;outline:none}
+.field-inp::placeholder{color:#BCC5D0;font-weight:500}
+.field-save{background:#1C6EFF;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0;transition:transform .12s}
+.field-save:active{transform:scale(.92)}
+.green{color:#10B981}.red{color:#EF4444}.orange{color:#F59E0B}.blue{color:#1C6EFF}
+.btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,#1344C8,#1C6EFF);color:#fff;box-shadow:0 6px 20px rgba(28,110,255,.35)}
+.btn-g{background:#EEF2F7;color:#6B7A8D;font-weight:700}
+.btn-sm{padding:9px 14px;font-size:13px;width:auto;border-radius:10px}
+.badge-on{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#DCFCE7;color:#16A34A}
+.badge-off{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#FEE2E2;color:#DC2626}
+.badge-pend{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#FEF3C7;color:#D97706}
+
+/* ── SUMMARY ── */
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.sum-card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05);text-align:center}
+.sum-val{font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1;margin:4px 0}
+.sum-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#9BA8B5}
+
+/* ── CLIENT CARDS ── */
+.cli-card{background:#fff;border-radius:20px;padding:15px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05);cursor:pointer;transition:transform .12s}
+.cli-card:active{transform:scale(.985)}
+.cli-card-top{display:flex;align-items:center;gap:13px}
+.cli-avatar{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.cli-info{flex:1;min-width:0}
+.cli-name{font-size:16px;font-weight:800;color:#0F1923;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cli-meta{font-size:12px;color:#9BA8B5;margin-top:2px}
+.cli-actions{display:flex;gap:6px;flex-shrink:0}
+.cli-btn{width:34px;height:34px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:transform .12s;flex-shrink:0}
+.cli-btn:active{transform:scale(.88)}
+.cli-stats{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.cli-stat{background:#F2F4F8;border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:#6B7A8D}
+.cli-stat.ok{background:#DCFCE7;color:#16A34A}
+
+/* ── DETAIL PANEL ── */
+#detPanel{position:fixed;inset:0;z-index:600;background:#F2F4F8;display:flex;flex-direction:column;overflow:hidden;animation:slidein .25s ease}
+@keyframes slidein{from{transform:translateX(100%)}to{transform:none}}
+.det-hdr{flex-shrink:0;background:#fff;border-bottom:1px solid rgba(0,0,0,.06);padding:14px 20px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
+.det-back{width:36px;height:36px;border-radius:50%;background:#EEF2F7;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.det-back:active{background:#DDE3EC}
+.det-hdr-info{flex:1;min-width:0}
+.det-hdr-name{font-size:17px;font-weight:900;color:#0F1923;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.det-hdr-meta{font-size:12px;color:#9BA8B5;margin-top:1px}
+.det-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.det-body::-webkit-scrollbar{display:none}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi-card{background:#fff;border-radius:16px;padding:13px;box-shadow:0 2px 8px rgba(0,0,0,.055);border:1px solid rgba(0,0,0,.05)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#9BA8B5;margin-bottom:4px}
+.kpi-val{font-size:21px;font-weight:900;letter-spacing:-.8px;line-height:1}
+.hero-cli{background:linear-gradient(120deg,#1344C8,#1C6EFF);border-radius:20px;padding:20px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden}
+.hero-cli::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07)}
+
+/* ── HCARDS ── */
+.hcard{background:#fff;border-radius:16px;padding:14px;margin-bottom:9px;box-shadow:0 2px 8px rgba(0,0,0,.055);border:1px solid rgba(0,0,0,.05)}
+.hcard-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.hcard-mes{font-size:14.5px;font-weight:800;color:#0F1923}
+.hcard-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hcard-item .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#9BA8B5;margin-bottom:2px}
+.hcard-item .v{font-size:14px;font-weight:800}
+.stag{display:inline-block;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:800;margin-top:7px}
+.stag.sp{background:#DCFCE7;color:#16A34A}.stag.sn{background:#FEE2E2;color:#DC2626}
+
+/* ── LINK BOX ── */
+.link-box{background:linear-gradient(135deg,rgba(28,110,255,.06),rgba(14,165,233,.04));border:1.5px solid rgba(28,110,255,.15);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.link-box-title{font-size:12px;font-weight:800;color:#1C6EFF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.link-url{font-size:12px;color:#3A4A5C;word-break:break-all;line-height:1.5;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #E8EDF4;font-family:monospace}
+.link-actions{display:flex;gap:8px;margin-top:10px}
+
+/* ── DANGER ── */
+.danger-card{background:#FFF5F5;border:1.5px solid #FECDD3;border-radius:18px;overflow:hidden}
+.danger-row{display:flex;align-items:center;gap:13px;padding:14px 16px;border-bottom:1px solid #FEE2E2;cursor:pointer;transition:background .12s}
+.danger-row:last-child{border-bottom:none}
+.danger-row:active{background:#FEE2E2}
+.danger-txt{font-size:14.5px;font-weight:700;color:#EF4444;flex:1}
+
+/* ── SESSÃO ATIVA ── */
+.sess-bar{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(5,150,105,.04));border:1px solid rgba(16,185,129,.2);border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sess-dot{width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.sess-txt{font-size:13px;font-weight:700;color:#059669;flex:1}
+.sess-time{font-size:12px;color:#9BA8B5;font-weight:600}
+.btn-logout{background:none;border:1px solid #FECDD3;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:#EF4444;cursor:pointer;font-family:inherit;transition:background .15s;flex-shrink:0}
+.btn-logout:active{background:#FEE2E2}
+
+/* ── ALTERAR SENHA ── */
+.pw-field{width:100%;padding:13px 16px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:16px;font-family:inherit;outline:none;color:#0F1923;-webkit-appearance:none;transition:border-color .2s;margin-bottom:10px}
+.pw-field:focus{border-color:#1C6EFF}
+
+/* ── LOCK OVERLAY (aba protegida sem auth) ── */
+.lock-view{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60dvh;padding:32px;text-align:center}
+.lock-view-icon{font-size:52px;margin-bottom:14px}
+.lock-view-title{font-size:18px;font-weight:800;color:#0F1923;margin-bottom:6px}
+.lock-view-sub{font-size:13.5px;color:#9BA8B5;line-height:1.6;margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SPLASH ══════════
+     É um <button> para que o iOS Safari considere
+     como user gesture válido e libere o AudioContext  -->
+<button id="splash" onclick="splashTapped()" aria-label="Toque para entrar">
+  <div class="sp-version">Admin v3.0</div>
+
+  <!-- Ícone com Octo SVG colorido -->
+  <div class="sp-icon-wrap">
+    <div class="sp-rings">
+      <div class="sp-ring"></div>
+      <div class="sp-ring"></div>
+      <div class="sp-ring"></div>
+    </div>
+    <div class="sp-icon-card">
+      <!-- Octo SVG — laranja/rosa como na imagem -->
+      <svg class="sp-octo-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Sol laranja -->
+          <radialGradient id="sunG" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stop-color="#FFD060"/>
+            <stop offset="100%" stop-color="#FF8C28"/>
+          </radialGradient>
+          <!-- Corpo rosa/magenta do polvo -->
+          <linearGradient id="bodyG" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF6FA3"/>
+            <stop offset="100%" stop-color="#E0397A"/>
+          </linearGradient>
+          <!-- Brilho reflexo -->
+          <linearGradient id="shineG" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(255,255,255,.35)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Sol (círculo laranja por trás) -->
+        <circle cx="40" cy="28" r="14" fill="url(#sunG)" opacity=".95"/>
+        <!-- Brilho sol -->
+        <ellipse cx="36" cy="23" rx="5" ry="3" fill="rgba(255,255,220,.35)" transform="rotate(-20,36,23)"/>
+
+        <!-- Cabeça do polvo -->
+        <ellipse cx="40" cy="44" rx="18" ry="16" fill="url(#bodyG)"/>
+        <!-- Brilho na cabeça -->
+        <ellipse cx="33" cy="37" rx="7" ry="4" fill="url(#shineG)" transform="rotate(-20,33,37)"/>
+
+        <!-- Olhos -->
+        <circle cx="33.5" cy="42" r="3.2" fill="#fff" opacity=".95"/>
+        <circle cx="46.5" cy="42" r="3.2" fill="#fff" opacity=".95"/>
+        <circle cx="34.2" cy="42.5" r="1.6" fill="#3B1A5A"/>
+        <circle cx="47.2" cy="42.5" r="1.6" fill="#3B1A5A"/>
+        <!-- Brilho olhos -->
+        <circle cx="35" cy="41.5" r=".7" fill="#fff"/>
+        <circle cx="48" cy="41.5" r=".7" fill="#fff"/>
+
+        <!-- Tentáculos (8 pernas arredondadas) -->
+        <g fill="url(#bodyG)" opacity=".9">
+          <!-- Esquerda -->
+          <path d="M26 55 Q20 60 22 68 Q24 72 26 70 Q28 68 27 62 Q27 57 28 55Z"/>
+          <path d="M30 57 Q26 63 28 70 Q30 74 32 72 Q33 69 31 64 Q30 59 31 57Z"/>
+          <!-- Centro-esquerda -->
+          <path d="M34 58 Q33 65 35 72 Q37 76 39 74 Q40 70 38 65 Q37 60 36 58Z"/>
+          <!-- Centro-direita -->
+          <path d="M46 58 Q47 65 45 72 Q43 76 41 74 Q40 70 42 65 Q43 60 44 58Z"/>
+          <!-- Direita -->
+          <path d="M50 57 Q54 63 52 70 Q50 74 48 72 Q47 69 49 64 Q50 59 49 57Z"/>
+          <path d="M54 55 Q60 60 58 68 Q56 72 54 70 Q52 68 53 62 Q53 57 52 55Z"/>
+        </g>
+      </svg>
+    </div>
+    <div class="sp-icon-shadow"></div>
+  </div>
+
+  <!-- Título: "Energia" branco + "Octo" azul + ⚡ -->
+  <div class="sp-title">
+    <span style="color:#fff;font-weight:900">Energia</span><span class="sp-title-octo" style="font-weight:900">Octo</span>
+    <span class="sp-title-bolt">⚡</span>
+  </div>
+  <div class="sp-sub">Monitor Inteligente de Energia Solar</div>
+
+  <!-- Barra de progresso -->
+  <div class="sp-bar-wrap"><div class="sp-bar-fill"></div></div>
+
+  <!-- Dica de toque -->
+  <div class="sp-tap-hint">toque para começar</div>
+</button>
+
+<!-- ══════════ TOAST ══════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════ MODAL GENÉRICO ══════════ -->
+<div class="mover" id="modal" style="display:none" onclick="closeMod(event)">
+  <div class="mbox"><div class="m-handle"></div><div id="mbody"></div></div>
+</div>
+
+<!-- ══════════ MODAL DE AUTENTICAÇÃO (ao clicar Admin) ══════════ -->
+<div id="authModal" style="display:none">
+  <div class="auth-sheet">
+    <div class="auth-handle"></div>
+    <div class="auth-icon">🔐</div>
+    <div class="auth-title">Autenticação Admin</div>
+    <div class="auth-sub">Digite a senha para liberar as ações administrativas</div>
+    <div class="auth-pw-wrap">
+      <input class="auth-pw-inp" type="password" id="authPwInp"
+        placeholder="••••••••" autocomplete="off" inputmode="none"
+        onkeydown="if(event.key==='Enter')doAuth()">
+      <button class="auth-pw-eye" id="authPwEye" onclick="toggleAuthPw()">👁</button>
+    </div>
+    <div class="auth-err" id="authErr"></div>
+    <div class="auth-att" id="authAtt"></div>
+    <button class="auth-btn" id="authBtn" onclick="doAuth()">🔓 Entrar no Admin</button>
+    <button class="auth-cancel" onclick="closeAuthModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ══════════ PAINEL DE DETALHE DO CLIENTE ══════════ -->
+<div id="detPanel" style="display:none">
+  <div class="det-hdr">
+    <button class="det-back" onclick="closeDet()">‹</button>
+    <div class="det-hdr-info">
+      <div class="det-hdr-name" id="detName">—</div>
+      <div class="det-hdr-meta" id="detMeta">—</div>
+    </div>
+    <button class="btn-sm btn btn-p" style="font-size:13px" onclick="openEditFromDet()">✏️ Editar</button>
+  </div>
+  <div class="det-body" id="detBody"></div>
+</div>
+
+<!-- ══════════ APP PRINCIPAL ══════════ -->
+<div id="app">
+
+  <!-- TOPBAR com botão Admin -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-octo">🐙</div>
+      <div>
+        <div class="topbar-name">Energia<em>Octo</em></div>
+        <div class="topbar-sub" id="topSub">Painel de Gestão</div>
+      </div>
+    </div>
+    <!-- Botão Admin — aqui é solicitada a senha -->
+    <button class="btn-admin locked" id="btnAdmin" onclick="onAdminBtnClick()">
+      <div class="btn-admin-dot"></div>
+      <span id="btnAdminLbl">Admin</span>
+    </button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on" id="tab-visao"    onclick="switchTab('visao')"   ><span class="tab-icon">📊</span><span class="tab-lbl">Visão</span></button>
+    <button class="tab"    id="tab-clientes" onclick="switchTab('clientes')" ><span class="tab-icon">👥</span><span class="tab-lbl">Clientes</span></button>
+    <button class="tab"    id="tab-editar"   onclick="switchTab('editar')"   ><span class="tab-icon">✏️</span><span class="tab-lbl">Editar</span></button>
+    <button class="tab"    id="tab-sistema"  onclick="switchTab('sistema')"  ><span class="tab-icon">🔌</span><span class="tab-lbl">Sistema</span></button>
+    <button class="tab"    id="tab-visual"   onclick="switchTab('visual')"   ><span class="tab-icon">👁</span><span class="tab-lbl">Visual</span></button>
+    <button class="tab"    id="tab-dados"    onclick="switchTab('dados')"    ><span class="tab-icon">🗄</span><span class="tab-lbl">Dados</span></button>
+  </div>
+
+  <div class="tab-body" id="tabBody"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+const R=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const K=v=>(+v||0).toLocaleString('pt-BR',{maximumFractionDigits:1})+' kWh';
+const P=v=>(+v||0).toFixed(1)+'%';
+const N=v=>+v||0;
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MABR=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const BAND={'Verde':'🟢 Verde — Normal','Amarela':'🟡 Amarela','Vermelha 1':'🔴 Vermelha Nível 1','Vermelha 2':'🔴 Vermelha Nível 2','Escassez':'⛔ Escassez'};
+const BCOR={'Verde':'#10B981','Amarela':'#F59E0B','Vermelha 1':'#EF4444','Vermelha 2':'#DC2626','Escassez':'#7C3AED'};
+
+/* ══════════════════════════════════════════════
+   STORAGE
+══════════════════════════════════════════════ */
+const getClientes=()=>JSON.parse(localStorage.getItem('eo_clientes')||'[]');
+const setClientes=d=>localStorage.setItem('eo_clientes',JSON.stringify(d));
+const getPerfil=id=>JSON.parse(localStorage.getItem(`eo_perfil_${id}`)||'null');
+const setPerfil=(id,d)=>localStorage.setItem(`eo_perfil_${id}`,JSON.stringify(d));
+const getRegs=id=>JSON.parse(localStorage.getItem(`eo_regs_${id}`)||'[]');
+const setRegs=(id,d)=>localStorage.setItem(`eo_regs_${id}`,JSON.stringify(d));
+function getPw(){return localStorage.getItem('eo_admin_pw')||'Oct@2030';}
+function setPw(p){localStorage.setItem('eo_admin_pw',p);}
+
+function perfilDefault(nome){
+  return{
+    nome:nome||'Novo Cliente',saudacao:'👋',status:'ativo',cor:'#1C6EFF',emoji:'👤',obs:'',
+    distribuidora:'',nrContrato:'',nrMedidor:'',nrInstalacao:'',
+    classeConsumidor:'Residencial',grupoTensao:'Baixa Tensão',modalidade:'Convencional',vencimentoDia:'10',
+    tarifaFP:'0,65',tarifaInt:'0,87',tarifaPonta:'1,34',tarifaPadrao:'0.653',bandeira:'Verde',meta:300,
+    circ1Nome:'Ar-Condicionado',circ1Loc:'Quarto principal',circ1On:true,
+    circ2Nome:'Cozinha',circ2Loc:'Fogão + micro-ondas',circ2On:true,
+    circ3Nome:'Iluminação',circ3Loc:'Toda residência',circ3On:true,
+    showCircuitos:true,showMetaVerde:true,showHorarioSolar:true,showBandeira:true,
+    showInicio:true,showConsumo:true,showFatura:true,showDicas:true,showRegistro:true,
+    criado:new Date().toISOString()
+  };
+}
+
+/* ══════════════════════════════════════════════
+   AUTH — modal ao clicar no botão Admin
+══════════════════════════════════════════════ */
+let isAuth=false;
+let authAttempts=0;
+let sessStart=null;
+let curTab='visao';
+let curCid=null;
+
+// Abas que exigem autenticação
+const PROTECTED=['clientes','editar','sistema','visual','dados'];
+
+function onAdminBtnClick(){
+  if(isAuth){
+    // Já autenticado → mostra menu de opções
+    openAuthMenu();
+  } else {
+    // Não autenticado → abre modal de senha
+    openAuthModal();
+  }
+}
+
+function openAuthModal(){
+  document.getElementById('authPwInp').value='';
+  document.getElementById('authErr').textContent='';
+  document.getElementById('authAtt').textContent='';
+  document.getElementById('authModal').style.display='flex';
+  setTimeout(()=>document.getElementById('authPwInp').focus(),350);
+}
+function closeAuthModal(){
+  document.getElementById('authModal').style.display='none';
+}
+function toggleAuthPw(){
+  const i=document.getElementById('authPwInp');
+  const e=document.getElementById('authPwEye');
+  i.type=i.type==='password'?'text':'password';
+  e.textContent=i.type==='password'?'👁':'🙈';
+}
+function doAuth(){
+  const pw=(document.getElementById('authPwInp').value||'').trim();
+  if(pw===getPw()){
+    // Sucesso
+    isAuth=true; authAttempts=0; sessStart=new Date();
+    closeAuthModal();
+    updateAdminBtn();
+    startSessTimer();
+    // Vai para clientes automaticamente
+    switchTab('clientes');
+    toast('✅ Admin liberado!');
+  } else {
+    authAttempts++;
+    const err=document.getElementById('authErr');
+    const att=document.getElementById('authAtt');
+    err.textContent='Senha incorreta.';
+    err.classList.remove('auth-shake'); void err.offsetWidth; err.classList.add('auth-shake');
+    document.getElementById('authPwInp').value='';
+    if(authAttempts>=2) att.textContent=`⚠️ ${authAttempts} tentativa${authAttempts>1?'s':''} errada${authAttempts>1?'s':''}`;
+    if(authAttempts>=5){
+      const btn=document.getElementById('authBtn');
+      btn.disabled=true; att.textContent='🔒 Bloqueado por 30s';
+      setTimeout(()=>{authAttempts=0;btn.disabled=false;att.textContent='';},30000);
+    }
+  }
+}
+// CSS da animação de shake no auth-err
+document.addEventListener('DOMContentLoaded',()=>{
+  const style=document.createElement('style');
+  style.textContent='.auth-shake{animation:ashake .35s}@keyframes ashake{0%,100%{transform:none}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}';
+  document.head.appendChild(style);
+});
+
+function openAuthMenu(){
+  // Modal com opções quando já autenticado
+  const d=new Date()-sessStart;
+  const sessStr=`${Math.floor(d/60000)}m ${Math.floor((d%60000)/1000)}s`;
+  openMod(`
+    <div class="m-title">⚙️ Admin</div>
+    <div class="sess-bar" style="margin-bottom:14px">
+      <div class="sess-dot"></div>
+      <div class="sess-txt">Sessão ativa</div>
+      <div class="sess-time">${sessStr}</div>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>
+    <div class="acard">
+      <div class="arow tap" onclick="closeMod();switchTab('clientes')">
+        <div class="arow-ico" style="background:#EEF3FF">👥</div>
+        <div class="arow-info"><div class="arow-title">Gerenciar Clientes</div><div class="arow-sub">Ver, adicionar, editar</div></div>
+        <div class="arr">›</div>
+      </div>
+      <div class="arow tap" onclick="closeMod();switchTab('editar')">
+        <div class="arow-ico" style="background:#FFF8EC">✏️</div>
+        <div class="arow-info"><div class="arow-title">Editar Perfil</div><div class="arow-sub">Dados, tarifas, conta</div></div>
+        <div class="arr">›</div>
+      </div>
+      <div class="arow tap" onclick="closeMod();switchTab('sistema')">
+        <div class="arow-ico" style="background:#EDFBF3">🔌</div>
+        <div class="arow-info"><div class="arow-title">Sistema / Circuitos</div><div class="arow-sub">Gerenciar circuitos</div></div>
+        <div class="arr">›</div>
+      </div>
+      <div class="arow tap" onclick="closeMod();switchTab('visual')">
+        <div class="arow-ico" style="background:#F3F0FF">👁</div>
+        <div class="arow-info"><div class="arow-title">Visual / Telas</div><div class="arow-sub">Controlar visibilidade</div></div>
+        <div class="arr">›</div>
+      </div>
+      <div class="arow tap" onclick="closeMod();switchTab('dados')">
+        <div class="arow-ico" style="background:#F0F4FF">🗄</div>
+        <div class="arow-info"><div class="arow-title">Dados / Backup</div><div class="arow-sub">Exportar, importar, danger zone</div></div>
+        <div class="arr">›</div>
+      </div>
+      <div class="arow tap" onclick="closeMod();openChangePw()">
+        <div class="arow-ico" style="background:#F7F9FC">🔑</div>
+        <div class="arow-info"><div class="arow-title">Alterar Senha</div><div class="arow-sub">Mudar senha do admin</div></div>
+        <div class="arr">›</div>
+      </div>
+    </div>
+    <button class="btn" style="background:#FEE2E2;color:#EF4444;margin-top:12px;font-weight:800" onclick="doLogout()">🚪 Encerrar Sessão</button>
+  `);
+}
+
+function doLogout(){
+  if(!confirm('Encerrar sessão administrativa?')) return;
+  isAuth=false; sessStart=null; authAttempts=0;
+  clearInterval(window._st);
+  updateAdminBtn();
+  closeMod();
+  switchTab('visao');
+  toast('🔒 Sessão encerrada.');
+}
+
+function openChangePw(){
+  closeMod();
+  openMod(`
+    <div class="m-title">🔑 Alterar Senha Admin</div>
+    <div style="font-size:13px;color:#6B7A8D;margin-bottom:16px;line-height:1.5">A nova senha será salva neste navegador.</div>
+    <input type="password" class="pw-field" id="cpw1" placeholder="Nova senha (mín. 6 caracteres)" autocomplete="new-password">
+    <input type="password" class="pw-field" id="cpw2" placeholder="Confirmar nova senha" autocomplete="new-password">
+    <button class="btn btn-p" onclick="salvarNovaSenha()">💾 Salvar Nova Senha</button>
+    <button class="btn btn-g" style="margin-top:8px" onclick="closeMod()">Cancelar</button>
+  `);
+}
+
+function salvarNovaSenha(){
+  const p1=(document.getElementById('cpw1').value||'').trim();
+  const p2=(document.getElementById('cpw2').value||'').trim();
+  if(p1.length<6){toast('⚠️ Mínimo 6 caracteres.');return;}
+  if(p1!==p2){toast('⚠️ Senhas não conferem.');return;}
+  setPw(p1);closeMod();
+  toast('✅ Senha alterada!');
+}
+
+function updateAdminBtn(){
+  const btn=document.getElementById('btnAdmin');
+  const lbl=document.getElementById('btnAdminLbl');
+  if(isAuth){
+    btn.className='btn-admin unlocked';
+    lbl.textContent='Admin ✓';
+  } else {
+    btn.className='btn-admin locked';
+    lbl.textContent='Admin';
+  }
+}
+
+function startSessTimer(){
+  clearInterval(window._st);
+  window._st=setInterval(()=>{
+    if(!sessStart||!isAuth) return;
+    // atualiza topSub com tempo de sessão
+    const d=new Date()-sessStart;
+    document.getElementById('topSub').textContent=
+      `Admin ativo · ${Math.floor(d/60000)}m ${Math.floor((d%60000)/1000)}s`;
+  },1000);
+}
+
+/* ══════════════════════════════════════════════
+   TOAST / MODAL
+══════════════════════════════════════════════ */
+let _tt;
+function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('on'),2800);}
+function openMod(html){document.getElementById('mbody').innerHTML=html;document.getElementById('modal').style.display='flex';}
+function closeMod(e){if(!e||e.target===document.getElementById('modal'))document.getElementById('modal').style.display='none';}
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+function switchTab(tab){
+  curTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+tab).classList.add('on');
+  renderTab();
+}
+function renderTab(){
+  const t=curTab;
+  if(PROTECTED.includes(t)&&!isAuth){ renderLockView(t); return; }
+  if(t==='visao')    renderVisao();
+  else if(t==='clientes') renderClientes();
+  else if(t==='editar')   renderEditar();
+  else if(t==='sistema')  renderSistema();
+  else if(t==='visual')   renderVisual();
+  else if(t==='dados')    renderDados();
+}
+
+/* Tela de bloqueio na aba quando não autenticado */
+function renderLockView(tab){
+  const NAMES={clientes:'Clientes',editar:'Editar',sistema:'Sistema',visual:'Visual',dados:'Dados'};
+  document.getElementById('tabBody').innerHTML=`
+    <div class="lock-view">
+      <div class="lock-view-icon">🔐</div>
+      <div class="lock-view-title">Área Restrita</div>
+      <div class="lock-view-sub">A aba <strong>${NAMES[tab]||tab}</strong> requer autenticação.<br>Toque em <strong>Admin</strong> na barra superior para entrar.</div>
+      <button class="btn btn-p" style="max-width:260px" onclick="openAuthModal()">🔓 Autenticar agora</button>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   ABA VISÃO — dashboard público (sem auth)
+══════════════════════════════════════════════ */
+function renderVisao(){
+  const el=document.getElementById('tabBody');
+  const clientes=getClientes();
+  const totalAtivos=clientes.filter(c=>c.status==='ativo').length;
+  const totalPend=clientes.filter(c=>c.status==='pendente').length;
+  const totalRegs=clientes.reduce((s,c)=>s+getRegs(c.id).length,0);
+  const totalEcon=clientes.reduce((s,c)=>s+getRegs(c.id).reduce((rs,r)=>rs+N(r.economia),0),0);
+  const totalProd=clientes.reduce((s,c)=>s+getRegs(c.id).reduce((rs,r)=>rs+N(r.producao),0),0);
+  const totalCons=clientes.reduce((s,c)=>s+getRegs(c.id).reduce((rs,r)=>rs+N(r.consumo),0),0);
+
+  // Cards de clientes (visão somente leitura)
+  const cliCards=clientes.length?clientes.slice(0,6).map(c=>{
+    const p=getPerfil(c.id)||perfilDefault(c.nome);
+    const regs=getRegs(c.id);
+    const econ=regs.reduce((s,r)=>s+N(r.economia),0);
+    const last=[...regs].sort((a,b)=>b.mes.localeCompare(a.mes))[0];
+    const statusCls=c.status==='ativo'?'badge-on':c.status==='pendente'?'badge-pend':'badge-off';
+    return `
+    <div class="cli-card" onclick="${isAuth?`openDet('${c.id}')`:`openAuthModal()`}" style="${!isAuth?'opacity:.85':''}">
+      <div class="cli-card-top">
+        <div class="cli-avatar" style="background:${p.cor||'#EEF3FF'}">${p.emoji||'👤'}</div>
+        <div class="cli-info">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div class="cli-name">${esc(p.nome)}</div>
+            <span class="${statusCls}">${c.status||'ativo'}</span>
+          </div>
+          <div class="cli-meta">${p.distribuidora||'Sistema solar'}${p.nrMedidor?' · Med. '+p.nrMedidor:''}</div>
+        </div>
+        ${isAuth?`<div class="cli-actions" onclick="event.stopPropagation()">
+          <button class="cli-btn" style="background:#EDFBF3;color:#10B981" onclick="openDet('${c.id}')">👁</button>
+          <button class="cli-btn" style="background:#EEF3FF;color:#1C6EFF" onclick="selectAndEdit('${c.id}')">✏️</button>
+          <button class="cli-btn" style="background:#FEE2E2;color:#EF4444" onclick="delCliente('${c.id}')">🗑</button>
+        </div>`:''}
+      </div>
+      <div class="cli-stats">
+        <span class="cli-stat">${regs.length} reg.</span>
+        ${econ>0?`<span class="cli-stat ok">${R(econ)}</span>`:''}
+        ${last?`<span class="cli-stat">${MABR[+(last.mes.split('-')[1]||1)-1]}/${last.mes.split('-')[0]}</span>`:''}
+      </div>
+    </div>`;
+  }).join(''):`
+    <div style="text-align:center;padding:48px 20px;color:#9BA8B5;background:#fff;border-radius:20px">
+      <div style="font-size:52px;margin-bottom:12px">👥</div>
+      <div style="font-size:16px;font-weight:700;color:#6B7A8D">Nenhum cliente ainda</div>
+      <div style="font-size:13px;margin-top:6px">Autentique-se como Admin para cadastrar</div>
+    </div>`;
+
+  el.innerHTML=`
+    <!-- KPIs gerais sempre visíveis -->
+    <div style="height:4px"></div>
+    <div class="summary">
+      <div class="sum-card"><div class="sum-lbl">Clientes</div><div class="sum-val blue">${clientes.length}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Ativos</div><div class="sum-val green">${totalAtivos}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Registros</div><div class="sum-val">${totalRegs}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Economia Total</div><div class="sum-val green" style="font-size:18px">${R(totalEcon)}</div></div>
+    </div>
+
+    <!-- Métricas de energia -->
+    ${totalProd>0?`
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;color:#0F1923;margin-bottom:12px">⚡ Energia Consolidada</div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F4F8;font-size:13.5px">
+        <span style="color:#6B7A8D">Total Produzido</span><span style="font-weight:800;color:#F59E0B">${K(totalProd)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F4F8;font-size:13.5px">
+        <span style="color:#6B7A8D">Total Consumido</span><span style="font-weight:800;color:#1C6EFF">${K(totalCons)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13.5px">
+        <span style="color:#6B7A8D">Saldo Geral</span><span style="font-weight:800;color:${totalProd-totalCons>=0?'#10B981':'#EF4444'}">${K(totalProd-totalCons)}</span>
+      </div>
+    </div>`:''}
+
+    <!-- Status das abas protegidas -->
+    ${!isAuth?`
+    <div style="background:linear-gradient(135deg,rgba(28,110,255,.06),rgba(14,165,233,.03));border:1px solid rgba(28,110,255,.12);border-radius:16px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:28px">🔐</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;color:#1C6EFF">Ações administrativas bloqueadas</div>
+        <div style="font-size:12px;color:#9BA8B5;margin-top:2px">Toque em <strong>Admin</strong> para autenticar e liberar gestão completa</div>
+      </div>
+      <button class="btn-sm btn btn-p" onclick="openAuthModal()" style="font-size:12px;padding:8px 12px">Entrar</button>
+    </div>`:`
+    <div class="sess-bar" style="margin-bottom:14px">
+      <div class="sess-dot"></div>
+      <div class="sess-txt">Sessão administrativa ativa</div>
+      <div class="sess-time" id="sessTimeVis">—</div>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>`}
+
+    <!-- Lista de clientes -->
+    <div style="font-size:16px;font-weight:800;color:#0F1923;margin-bottom:10px;letter-spacing:-.3px">
+      👥 Clientes
+      ${isAuth?`<button class="btn-sm btn btn-p" style="float:right;font-size:12px;padding:7px 14px;margin-top:-2px" onclick="novoCliente()">+ Novo</button>`:''}
+    </div>
+    ${cliCards}
+    ${clientes.length>6?`<div style="text-align:center;padding:12px;font-size:13px;color:#9BA8B5">+ ${clientes.length-6} clientes · <span style="color:#1C6EFF;font-weight:700;cursor:pointer" onclick="switchTab('clientes')">Ver todos →</span></div>`:''}
+    <div style="height:8px"></div>`;
+
+  // Timer de sessão inline
+  if(isAuth){
+    clearInterval(window._stVis);
+    window._stVis=setInterval(()=>{
+      const el2=document.getElementById('sessTimeVis');
+      if(!el2){clearInterval(window._stVis);return;}
+      const d=new Date()-sessStart;
+      el2.textContent=`${Math.floor(d/60000)}m ${Math.floor((d%60000)/1000)}s`;
+    },1000);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   ABA CLIENTES (requer auth)
+══════════════════════════════════════════════ */
+function renderClientes(){
+  const el=document.getElementById('tabBody');
+  const clientes=getClientes();
+  const totalRegs=clientes.reduce((s,c)=>s+getRegs(c.id).length,0);
+  const totalAtivos=clientes.filter(c=>c.status==='ativo').length;
+  const totalEcon=clientes.reduce((s,c)=>s+getRegs(c.id).reduce((rs,r)=>rs+N(r.economia),0),0);
+  document.getElementById('topSub').textContent=`${clientes.length} cliente(s) cadastrado(s)`;
+
+  const cards=clientes.length?clientes.map(c=>{
+    const p=getPerfil(c.id)||perfilDefault(c.nome);
+    const regs=getRegs(c.id);
+    const last=[...regs].sort((a,b)=>b.mes.localeCompare(a.mes))[0];
+    const econ=regs.reduce((s,r)=>s+N(r.economia),0);
+    const statusCls=c.status==='ativo'?'badge-on':c.status==='pendente'?'badge-pend':'badge-off';
+    return `<div class="cli-card" onclick="openDet('${c.id}')">
+      <div class="cli-card-top">
+        <div class="cli-avatar" style="background:${p.cor||'#EEF3FF'}">${p.emoji||'👤'}</div>
+        <div class="cli-info">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div class="cli-name">${esc(p.nome)}</div>
+            <span class="${statusCls}">${c.status||'ativo'}</span>
+          </div>
+          <div class="cli-meta">${p.distribuidora||'Sistema solar'}${p.nrMedidor?' · Med. '+p.nrMedidor:''}</div>
+        </div>
+        <div class="cli-actions" onclick="event.stopPropagation()">
+          <button class="cli-btn" style="background:#EDFBF3;color:#10B981" onclick="openDet('${c.id}')">👁</button>
+          <button class="cli-btn" style="background:#EEF3FF;color:#1C6EFF" onclick="selectAndEdit('${c.id}')">✏️</button>
+          <button class="cli-btn" style="background:#FEE2E2;color:#EF4444" onclick="delCliente('${c.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="cli-stats">
+        <span class="cli-stat">${regs.length} reg.</span>
+        ${econ>0?`<span class="cli-stat ok">${R(econ)} ec.</span>`:''}
+        ${last?`<span class="cli-stat">${MABR[+(last.mes.split('-')[1]||1)-1]}/${last.mes.split('-')[0]}</span>`:''}
+        ${p.nrMedidor?`<span class="cli-stat">Med. ${p.nrMedidor}</span>`:''}
+      </div>
+    </div>`;
+  }).join(''):`<div style="text-align:center;padding:52px 20px;color:#9BA8B5"><div style="font-size:52px;margin-bottom:12px">👥</div><div style="font-size:16px;font-weight:700;color:#6B7A8D">Nenhum cliente</div><div style="font-size:13px;margin-top:6px">Clique em "+ Novo Cliente"</div></div>`;
+
+  el.innerHTML=`
+    <div class="summary">
+      <div class="sum-card"><div class="sum-lbl">Total</div><div class="sum-val blue">${clientes.length}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Ativos</div><div class="sum-val green">${totalAtivos}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Registros</div><div class="sum-val">${totalRegs}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Economia</div><div class="sum-val green" style="font-size:17px">${R(totalEcon)}</div></div>
+    </div>
+    <button class="btn btn-p" style="margin-bottom:16px" onclick="novoCliente()">+ Novo Cliente</button>
+    ${cards}`;
+}
+
+/* ══════════════════════════════════════════════
+   DETALHE DO CLIENTE
+══════════════════════════════════════════════ */
+function openDet(cid){
+  curCid=cid;
+  const p=getPerfil(cid)||perfilDefault('');
+  const regs=getRegs(cid);
+  const sorted=[...regs].sort((a,b)=>b.mes.localeCompare(a.mes));
+  const totalProd=regs.reduce((s,r)=>s+N(r.producao),0);
+  const totalCons=regs.reduce((s,r)=>s+N(r.consumo),0);
+  const totalEcon=regs.reduce((s,r)=>s+N(r.economia),0);
+  const totalFin=regs.reduce((s,r)=>s+N(r.saldoFin),0);
+  document.getElementById('detName').textContent=p.nome;
+  document.getElementById('detMeta').textContent=`${regs.length} reg. · ${p.distribuidora||'Sistema solar'}${p.nrMedidor?' · Med. '+p.nrMedidor:''}`;
+  const statusCls=p.status==='ativo'?'badge-on':p.status==='pendente'?'badge-pend':'badge-off';
+  // Gera link do cliente no mesmo domínio
+  const base = location.origin + '/cliente.html';
+  const link = base + '?id=' + cid;
+  const histCards=sorted.map(r=>{
+    const[ano,mm]=(r.mes||'').split('-');
+    const mesL=mm?`${MESES[+mm-1]} ${ano}`:r.mes;
+    const s=N(r.saldo);
+    return `<div class="hcard"><div class="hcard-head"><div class="hcard-mes">📅 ${mesL}</div><button class="btn-sm btn" style="background:#FEE2E2;color:#EF4444;padding:6px 10px;font-size:11px" onclick="delReg('${cid}','${r.id}')">🗑</button></div><div class="hcard-g"><div class="hcard-item"><div class="lbl">⚡ Produção</div><div class="v" style="color:#F59E0B">${K(N(r.producao))}</div></div><div class="hcard-item"><div class="lbl">🏠 Consumo</div><div class="v" style="color:#1C6EFF">${K(N(r.consumo))}</div></div><div class="hcard-item"><div class="lbl">💰 Economia</div><div class="v green">${R(N(r.economia))}</div></div><div class="hcard-item"><div class="lbl">🌿 Autossuf.</div><div class="v">${P(N(r.autoSuf))}</div></div></div><span class="stag ${s>=0?'sp':'sn'}">${s>=0?'+':''}${K(s)}</span></div>`;
+  }).join('');
+  document.getElementById('detBody').innerHTML=`
+    <div class="hero-cli">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.6;margin-bottom:4px">Cliente</div>
+      <div style="font-size:26px;font-weight:900;margin-bottom:4px">${esc(p.nome)}</div>
+      <div style="font-size:13px;opacity:.6">${p.distribuidora||'Sistema solar'}${p.nrMedidor?' · Med. '+p.nrMedidor:''}</div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="${statusCls}">${p.status||'ativo'}</span>
+        ${p.classeConsumidor?`<span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#fff">${p.classeConsumidor}</span>`:''}
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-lbl">Produção Total</div><div class="kpi-val" style="color:#F59E0B;font-size:17px">${K(totalProd)}</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Consumo Total</div><div class="kpi-val" style="color:#1C6EFF;font-size:17px">${K(totalCons)}</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Economia Total</div><div class="kpi-val green" style="font-size:17px">${R(totalEcon)}</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Saldo Financeiro</div><div class="kpi-val" style="color:${totalFin>=0?'#10B981':'#EF4444'};font-size:17px">${R(totalFin)}</div></div>
+    </div>
+    <div class="link-box">
+      <div class="link-box-title">📱 Link do App do Cliente</div>
+      <div class="link-url">${link}</div>
+      <div class="link-actions">
+        <button class="btn btn-p btn-sm" style="flex:1" onclick="copyLink('${link}')">📋 Copiar</button>
+        <button class="btn btn-sm" style="flex:1;background:#EEF2F7;color:#6B7A8D;font-weight:700" onclick="window.open('${link}','_blank')">↗ Abrir</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px">📋 Dados da Conta</div>
+      ${[['Distribuidora',p.distribuidora],['Nº Contrato',p.nrContrato],['Nº Medidor',p.nrMedidor],['Nº Instalação',p.nrInstalacao],['Classe',p.classeConsumidor],['Tensão',p.grupoTensao],['Modalidade',p.modalidade],['Vencimento','Dia '+p.vencimentoDia],['Bandeira',p.bandeira],['Tarifa padrão','R$ '+p.tarifaPadrao+'/kWh']].filter(([,v])=>v&&v!=='Dia ').map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F4F8;font-size:13px"><span style="color:#6B7A8D">${k}</span><span style="font-weight:700">${esc(v)}</span></div>`).join('')||'<div style="text-align:center;color:#9BA8B5;padding:10px;font-size:13px">Nenhum dado</div>'}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn btn-p btn-sm" style="flex:1;padding:12px" onclick="addRegForClient('${cid}')">+ Registro</button>
+      <button class="btn btn-sm" style="flex:1;padding:12px;background:#EEF3FF;color:#1C6EFF;font-weight:800" onclick="openEditFromDet()">✏️ Editar</button>
+    </div>
+    <div style="font-size:16px;font-weight:800;color:#0F1923;margin-bottom:10px">📊 Registros Mensais</div>
+    ${histCards||'<div style="text-align:center;color:#9BA8B5;padding:32px;font-size:13px;background:#fff;border-radius:16px">Nenhum registro</div>'}
+    <div style="height:8px"></div>`;
+  document.getElementById('detPanel').style.display='flex';
+}
+function closeDet(){document.getElementById('detPanel').style.display='none';}
+function openEditFromDet(){closeDet();selectAndEdit(curCid);}
+function copyLink(url){
+  if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>toast('📋 Link copiado!')).catch(()=>toast('⚠️ Erro'));
+  else toast('⚠️ Copie manualmente');
+}
+function addRegForClient(cid){
+  const p=getPerfil(cid)||{};
+  const now=new Date();
+  const mes=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  openMod(`
+    <div class="m-title">📋 Novo Registro — ${esc(p.nome||cid)}</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${['mes:month:Mês/Ano:'+mes,'prod:number:⚡ Produzida (kWh):','cons:number:🏠 Consumida (kWh):','tar:number:💰 Tarifa (R$/kWh):'+(p.tarifaPadrao||''),'tax:number:📄 Taxa mínima (R$):','parc:number:🏦 Parcela (R$):'].map(f=>{
+        const[id,tp,lbl,val]=f.split(':');
+        return `<div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#6B7A8D;display:block;margin-bottom:4px">${lbl}</label>
+        <input type="${tp}" id="rm_${id}" value="${val||''}" placeholder="${lbl}" inputmode="${tp==='number'?'decimal':''}" style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;color:#0F1923"></div>`;
+      }).join('')}
+      <div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#6B7A8D;display:block;margin-bottom:4px">📝 Obs.</label>
+      <textarea id="rm_obs" placeholder="Observações..." style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:15px;font-family:inherit;outline:none;resize:vertical;min-height:60px;color:#0F1923"></textarea></div>
+      <button class="btn btn-p" onclick="saveRegAdmin('${cid}')">💾 Salvar</button>
+      <button class="btn btn-g" onclick="closeMod()">Cancelar</button>
+    </div>`);
+}
+function saveRegAdmin(cid){
+  const mes=document.getElementById('rm_mes').value;
+  const prod=document.getElementById('rm_prod').value;
+  const cons=document.getElementById('rm_cons').value;
+  const tar=document.getElementById('rm_tar').value;
+  if(!mes||!prod||!cons||!tar){toast('⚠️ Preencha mês, produção, consumo e tarifa.');return;}
+  const p2=N(prod),c=N(cons),t=N(tar),tx=N(document.getElementById('rm_tax').value),pa=N(document.getElementById('rm_parc').value);
+  const reg={id:uid(),mes,producao:prod,consumo:cons,tarifa:tar,
+    taxa:document.getElementById('rm_tax').value,parcela:document.getElementById('rm_parc').value,
+    obs:document.getElementById('rm_obs').value,
+    saldo:(p2-c).toFixed(2),economia:(p2*t).toFixed(2),
+    saldoFin:(p2*t-tx-pa).toFixed(2),autoSuf:(c>0?(p2/c)*100:0).toFixed(2),
+    criado:new Date().toISOString()};
+  const regs=getRegs(cid);const idx=regs.findIndex(r=>r.mes===mes);
+  if(idx>=0) regs[idx]=reg; else regs.push(reg);
+  setRegs(cid,regs);closeMod();toast('✅ Registro salvo!');
+  if(document.getElementById('detPanel').style.display!=='none') openDet(cid);
+  else renderTab();
+}
+function delReg(cid,rid){
+  if(!confirm('Excluir este registro?')) return;
+  setRegs(cid,getRegs(cid).filter(r=>r.id!==rid));
+  toast('🗑 Registro excluído.');openDet(cid);
+}
+
+/* ══════════════════════════════════════════════
+   ABA EDITAR
+══════════════════════════════════════════════ */
+function selectAndEdit(cid){curCid=cid;switchTab('editar');}
+function renderEditar(){
+  const el=document.getElementById('tabBody');
+  if(!curCid){el.innerHTML=pickerHtml('editar');return;}
+  const cid=curCid;const p=getPerfil(cid)||perfilDefault('');
+  const STATUS=['ativo','inativo','pendente'];
+  el.innerHTML=`
+    ${clienteBar(cid,p,'Editar perfil')}
+    <div class="sec"><div class="sec-title">👤 Identidade</div><div class="acard">
+      ${fRow(cid,'emoji','🎭','Emoji/Avatar',p.emoji,'')}
+      ${fRow(cid,'cor','🎨','Cor (hex)',p.cor,'Ex: #1C6EFF')}
+      ${fRow(cid,'nome','👤','Nome completo',p.nome,'Nome do cliente')}
+      ${fRow(cid,'saudacao','😊','Saudação',p.saudacao,'Ex: 👋')}
+      ${fRow(cid,'obs','📝','Obs. internas',p.obs,'Notas para o admin')}
+      <div class="arow"><div class="arow-ico" style="background:#F7F9FC">📌</div><div class="arow-info"><div class="arow-title">Status</div><div class="arow-sub" id="sub_${cid}_status">${p.status||'ativo'}</div></div></div>
+      <div class="field-wrap"><div class="field-inner"><select class="field-inp" id="inp_${cid}_status">${STATUS.map(s=>`<option value="${s}"${p.status===s?' selected':''}>${s}</option>`).join('')}</select><button class="field-save" onclick="saveSel('${cid}','status','inp_${cid}_status','sub_${cid}_status','Status atualizado!')">✓</button></div></div>
+    </div></div>
+    <div class="sec"><div class="sec-title">⚡ Conta de Energia</div><div class="acard">
+      ${fRow(cid,'distribuidora','🏢','Distribuidora',p.distribuidora,'CEMIG, ENEL...')}
+      ${fRow(cid,'nrContrato','📋','Nº Contrato',p.nrContrato,'Ex: 123456789')}
+      ${fRow(cid,'nrMedidor','🔢','Nº Medidor',p.nrMedidor,'Ex: 0438221')}
+      ${fRow(cid,'nrInstalacao','🏠','Nº Instalação',p.nrInstalacao,'Ex: 3001234567')}
+      ${fRow(cid,'classeConsumidor','👥','Classe',p.classeConsumidor,'Residencial')}
+      ${fRow(cid,'grupoTensao','⚡','Grupo Tensão',p.grupoTensao,'Baixa Tensão')}
+      ${fRow(cid,'modalidade','📊','Modalidade',p.modalidade,'Convencional')}
+      ${fRow(cid,'vencimentoDia','📅','Dia Vencimento',p.vencimentoDia,'Ex: 10')}
+    </div></div>
+    <div class="sec"><div class="sec-title">💰 Tarifas</div><div class="acard">
+      ${fRow(cid,'tarifaFP','🟢','Fora Ponta (R$/kWh)',p.tarifaFP,'0,65')}
+      ${fRow(cid,'tarifaInt','🟡','Intermediária (R$/kWh)',p.tarifaInt,'0,87')}
+      ${fRow(cid,'tarifaPonta','🔴','Ponta (R$/kWh)',p.tarifaPonta,'1,34')}
+      ${fRow(cid,'tarifaPadrao','📌','Tarifa Padrão (R$/kWh)',p.tarifaPadrao,'0.653')}
+      <div class="arow"><div class="arow-ico" style="background:#EDF7ED">🚩</div><div class="arow-info"><div class="arow-title">Bandeira</div><div class="arow-sub" id="sub_${cid}_bandeira">${BAND[p.bandeira]||p.bandeira}</div></div></div>
+      <div class="field-wrap"><div class="field-inner"><select class="field-inp" id="inp_${cid}_bandeira">${Object.entries(BAND).map(([v,l])=>`<option value="${v}"${p.bandeira===v?' selected':''}>${l}</option>`).join('')}</select><button class="field-save" onclick="saveBand('${cid}')">✓</button></div></div>
+    </div></div>
+    <div class="sec"><div class="sec-title">🎯 Meta</div><div class="acard">${fRow(cid,'meta','🎯','Meta Mensal (kWh)',p.meta,'Ex: 500')}</div></div>`;
+}
+
+/* ══════════════════════════════════════════════
+   ABA SISTEMA
+══════════════════════════════════════════════ */
+function renderSistema(){
+  const el=document.getElementById('tabBody');
+  if(!curCid){el.innerHTML=pickerHtml('sistema');return;}
+  const cid=curCid;const p=getPerfil(cid)||perfilDefault('');
+  el.innerHTML=`
+    ${clienteBar(cid,p,'Circuitos')}
+    <div class="sec"><div class="sec-title">🔌 Circuitos do Cliente</div><div class="acard">
+    ${[1,2,3].map(i=>`
+      <div class="arow">
+        <div class="arow-ico" style="background:${['#EEF3FF','#FFF8EC','#EDFBF3'][i-1]}">${['❄️','🍳','💡'][i-1]}</div>
+        <div class="arow-info">
+          <div class="arow-title" id="cNm_${cid}_${i}">${esc(p['circ'+i+'Nome']||'Circuito '+i)}</div>
+          <div class="arow-sub" id="cLc_${cid}_${i}">${esc(p['circ'+i+'Loc']||'—')}</div>
+        </div>
+        <button class="tog ${p['circ'+i+'On']?'on':'off'}" id="ctog_${cid}_${i}" onclick="togCirc('${cid}',${i})"></button>
+      </div>
+      <div class="field-wrap" style="padding-top:8px"><div style="display:flex;flex-direction:column;gap:7px">
+        <div class="field-inner"><input class="field-inp" id="cNmI_${cid}_${i}" placeholder="Nome" value="${esc(p['circ'+i+'Nome']||'')}"></div>
+        <div class="field-inner"><input class="field-inp" id="cLcI_${cid}_${i}" placeholder="Localização" value="${esc(p['circ'+i+'Loc']||'')}">
+        <button class="field-save" onclick="saveCirc('${cid}',${i})">✓</button></div>
+      </div></div>`).join('')}
+    </div></div>`;
+}
+
+/* ══════════════════════════════════════════════
+   ABA VISUAL
+══════════════════════════════════════════════ */
+function renderVisual(){
+  const el=document.getElementById('tabBody');
+  if(!curCid){el.innerHTML=pickerHtml('visual');return;}
+  const cid=curCid;const p=getPerfil(cid)||perfilDefault('');
+  el.innerHTML=`
+    ${clienteBar(cid,p,'Visibilidade')}
+    <div class="sec"><div class="sec-title">👁 Telas no App do Cliente</div><div class="acard">
+      ${togRow(cid,'showInicio','⚡','Tela Início',p.showInicio)}
+      ${togRow(cid,'showConsumo','📊','Tela Consumo',p.showConsumo)}
+      ${togRow(cid,'showFatura','💰','Tela Fatura',p.showFatura)}
+      ${togRow(cid,'showDicas','🌿','Tela Dicas',p.showDicas)}
+      ${togRow(cid,'showRegistro','📋','Botão Registro (🐙)',p.showRegistro)}
+    </div></div>
+    <div class="sec"><div class="sec-title">🧩 Seções do Dashboard</div><div class="acard">
+      ${togRow(cid,'showCircuitos','🔌','Circuitos Ativos',p.showCircuitos)}
+      ${togRow(cid,'showMetaVerde','🌿','Card Meta Verde',p.showMetaVerde)}
+      ${togRow(cid,'showHorarioSolar','☀️','Card Horário Solar',p.showHorarioSolar)}
+      ${togRow(cid,'showBandeira','🚩','Badge Bandeira',p.showBandeira)}
+    </div></div>`;
+}
+
+/* ══════════════════════════════════════════════
+   ABA DADOS
+══════════════════════════════════════════════ */
+function renderDados(){
+  const el=document.getElementById('tabBody');
+  const clientes=getClientes();
+  el.innerHTML=`
+    <div class="sec"><div class="sec-title">🗄 Backup</div><div class="acard">
+      <div class="arow tap" onclick="exportAll()"><div class="arow-ico" style="background:#EDFBF3">📤</div><div class="arow-info"><div class="arow-title">Exportar tudo (JSON)</div><div class="arow-sub">Todos clientes, perfis e registros</div></div><div class="arr">›</div></div>
+      <div class="arow tap" onclick="importJSON()"><div class="arow-ico" style="background:#EEF3FF">📥</div><div class="arow-info"><div class="arow-title">Importar JSON</div><div class="arow-sub">Restaurar backup</div></div><div class="arr">›</div></div>
+    </div></div>
+    <div class="sec"><div class="sec-title">📊 Resumo por Cliente</div><div class="acard">
+      ${clientes.map(c=>{
+        const p=getPerfil(c.id)||{};const regs=getRegs(c.id);
+        const econ=regs.reduce((s,r)=>s+N(r.economia),0);
+        const statusCls=c.status==='ativo'?'badge-on':c.status==='pendente'?'badge-pend':'badge-off';
+        return `<div class="arow tap" onclick="openDet('${c.id}')"><div class="arow-ico" style="background:${p.cor||'#EEF3FF'}">${p.emoji||'👤'}</div><div class="arow-info"><div class="arow-title">${esc(p.nome)} <span class="${statusCls}" style="font-size:10px">${c.status}</span></div><div class="arow-sub">${regs.length} reg. · ${R(econ)}</div></div><div class="arr">›</div></div>`;
+      }).join('')||'<div style="text-align:center;color:#9BA8B5;padding:20px;font-size:13px">Nenhum cliente</div>'}
+    </div></div>
+    <div class="sec"><div class="sec-title">🔑 Senha Admin</div>
+      <div class="acard" style="padding:16px">
+        <div style="font-size:13px;color:#6B7A8D;margin-bottom:12px;line-height:1.5">Altere a senha usada para autenticar o painel admin.</div>
+        <input type="password" class="pw-field" id="newPw1" placeholder="Nova senha (mín. 6 caracteres)" autocomplete="new-password">
+        <input type="password" class="pw-field" id="newPw2" placeholder="Confirmar nova senha" autocomplete="new-password">
+        <button class="btn btn-p" onclick="alterarSenha()">💾 Salvar Nova Senha</button>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-title">⚠️ Zona de Perigo</div>
+      <div class="danger-card">
+        <div class="danger-row" onclick="limparTodosRegs()"><div class="arow-ico" style="background:#FEE2E2;margin-right:4px">🗑</div><div class="danger-txt">Limpar todos os registros</div><span style="color:#EF4444">›</span></div>
+        <div class="danger-row" onclick="delTodosClientes()"><div class="arow-ico" style="background:#FEE2E2;margin-right:4px">👥</div><div class="danger-txt">Excluir todos os clientes</div><span style="color:#EF4444">›</span></div>
+        <div class="danger-row" onclick="factoryReset()"><div class="arow-ico" style="background:#FEE2E2;margin-right:4px">💥</div><div class="danger-txt">Factory reset — apagar tudo</div><span style="color:#EF4444">›</span></div>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS HTML
+══════════════════════════════════════════════ */
+function fRow(cid,field,icon,title,val,ph){
+  return `<div class="arow"><div class="arow-ico" style="background:#F7F9FC">${icon}</div><div class="arow-info"><div class="arow-title">${title}</div><div class="arow-sub" id="sub_${cid}_${field}">${esc(val)||'—'}</div></div></div>
+  <div class="field-wrap"><div class="field-inner"><input class="field-inp" id="inp_${cid}_${field}" placeholder="${ph}" value="${esc(val||'')}"><button class="field-save" onclick="saveField('${cid}','${field}','inp_${cid}_${field}','sub_${cid}_${field}')">✓</button></div></div>`;
+}
+function togRow(cid,field,icon,title,val){
+  return `<div class="arow"><div class="arow-ico" style="background:#F7F9FC">${icon}</div><div class="arow-info"><div class="arow-title">${title}</div><div class="arow-sub" id="ts_${cid}_${field}">${val?'✅ Visível':'⛔ Oculto'}</div></div><button class="tog ${val?'on':'off'}" id="tt_${cid}_${field}" onclick="togField('${cid}','${field}')"></button></div>`;
+}
+function clienteBar(cid,p,ctx){
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 16px;background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+    <div style="width:40px;height:40px;border-radius:12px;background:${p.cor||'#EEF3FF'};display:flex;align-items:center;justify-content:center;font-size:22px">${p.emoji||'👤'}</div>
+    <div style="flex:1"><div style="font-size:15px;font-weight:800">${esc(p.nome)}</div><div style="font-size:12px;color:#9BA8B5">${ctx}</div></div>
+    <button class="btn-sm btn btn-g" onclick="curCid=null;renderTab()">Trocar</button>
+  </div>`;
+}
+function pickerHtml(tab){
+  const cl=getClientes();
+  if(!cl.length) return `<div style="text-align:center;padding:52px 20px;color:#9BA8B5"><div style="font-size:52px;margin-bottom:12px">👥</div><div style="font-weight:700;color:#6B7A8D">Nenhum cliente</div><div style="font-size:13px;margin-top:6px"><span style="color:#1C6EFF;cursor:pointer" onclick="switchTab('clientes')">Criar na aba Clientes →</span></div></div>`;
+  return `<div class="sec"><div class="sec-title">Selecione um cliente</div><div class="acard">${cl.map(c=>{const p=getPerfil(c.id)||{};return `<div class="arow tap" onclick="curCid='${c.id}';renderTab()"><div class="arow-ico" style="background:${p.cor||'#EEF3FF'}">${p.emoji||'👤'}</div><div class="arow-info"><div class="arow-title">${esc(p.nome)}</div><div class="arow-sub">${c.status||'ativo'} · ${getRegs(c.id).length} reg.</div></div><div class="arr">›</div></div>`;}).join('')}</div></div>`;
+}
+
+/* ══════════════════════════════════════════════
+   SYNC — BroadcastChannel
+   Notifica o app cliente (mesma aba ou outras abas
+   do mesmo domínio) quando o admin salva algo.
+══════════════════════════════════════════════ */
+const _bc = (typeof BroadcastChannel !== 'undefined')
+  ? new BroadcastChannel('eo_sync') : null;
+
+function broadcastUpdate(type, cid) {
+  if (!_bc) return;
+  try { _bc.postMessage({ type, cid, ts: Date.now() }); } catch(e) {}
+}
+
+// Wrapper de setPerfil que notifica automaticamente
+const _origSetPerfil = setPerfil;
+function setPerfil(id, d) {
+  localStorage.setItem('eo_perfil_' + id, JSON.stringify(d));
+  broadcastUpdate('perfil', id);
+}
+// Wrapper de setRegs
+const _origSetRegs = setRegs;
+function setRegs(id, d) {
+  localStorage.setItem('eo_regs_' + id, JSON.stringify(d));
+  broadcastUpdate('regs', id);
+}
+
+/* ══════════════════════════════════════════════
+   AÇÕES
+══════════════════════════════════════════════ */
+function saveField(cid,field,inpId,subId){
+  const val=document.getElementById(inpId).value.trim();
+  const p=getPerfil(cid)||perfilDefault('');p[field]=val;setPerfil(cid,p);
+  const sub=document.getElementById(subId);if(sub) sub.textContent=val||'—';
+  const cl=getClientes();const idx=cl.findIndex(c=>c.id===cid);
+  if(idx>=0&&field==='nome'){cl[idx].nome=val;setClientes(cl);}
+  toast('✅ Salvo!');
+}
+function saveSel(cid,field,inpId,subId,msg){
+  const val=document.getElementById(inpId).value;
+  const p=getPerfil(cid)||perfilDefault('');p[field]=val;setPerfil(cid,p);
+  const cl=getClientes();const idx=cl.findIndex(c=>c.id===cid);
+  if(idx>=0){cl[idx].status=p.status;setClientes(cl);}
+  const sub=document.getElementById(subId);if(sub) sub.textContent=val||'—';
+  toast('✅ '+msg);
+}
+function saveBand(cid){
+  const val=document.getElementById(`inp_${cid}_bandeira`).value;
+  const p=getPerfil(cid)||perfilDefault('');p.bandeira=val;setPerfil(cid,p);
+  const sub=document.getElementById(`sub_${cid}_bandeira`);if(sub) sub.textContent=BAND[val]||val;
+  toast('✅ Bandeira atualizada!');
+}
+function togField(cid,field){
+  const p=getPerfil(cid)||perfilDefault('');p[field]=!p[field];setPerfil(cid,p);
+  const btn=document.getElementById(`tt_${cid}_${field}`);
+  const sub=document.getElementById(`ts_${cid}_${field}`);
+  if(btn){btn.classList.toggle('on',p[field]);btn.classList.toggle('off',!p[field]);}
+  if(sub) sub.textContent=p[field]?'✅ Visível':'⛔ Oculto';
+  toast(p[field]?'✅ Habilitado':'⛔ Desabilitado');
+}
+function togCirc(cid,i){
+  const p=getPerfil(cid)||perfilDefault('');p['circ'+i+'On']=!p['circ'+i+'On'];setPerfil(cid,p);
+  const btn=document.getElementById(`ctog_${cid}_${i}`);
+  if(btn){btn.classList.toggle('on',p['circ'+i+'On']);btn.classList.toggle('off',!p['circ'+i+'On']);}
+  toast(p['circ'+i+'On']?`✅ Circuito ${i} ligado`:`⛔ Circuito ${i} desligado`);
+}
+function saveCirc(cid,i){
+  const p=getPerfil(cid)||perfilDefault('');
+  p['circ'+i+'Nome']=document.getElementById(`cNmI_${cid}_${i}`).value.trim();
+  p['circ'+i+'Loc']=document.getElementById(`cLcI_${cid}_${i}`).value.trim();
+  setPerfil(cid,p);
+  const nm=document.getElementById(`cNm_${cid}_${i}`);if(nm) nm.textContent=p['circ'+i+'Nome'];
+  const lc=document.getElementById(`cLc_${cid}_${i}`);if(lc) lc.textContent=p['circ'+i+'Loc'];
+  toast(`✅ Circuito ${i} salvo!`);
+}
+function novoCliente(){
+  const nome=prompt('Nome do novo cliente:');
+  if(!nome||!nome.trim()) return;
+  const id=uid();
+  setPerfil(id,perfilDefault(nome.trim()));
+  const cl=getClientes();cl.push({id,nome:nome.trim(),status:'ativo'});setClientes(cl);
+  toast('✅ Cliente criado!');curCid=id;switchTab('editar');
+}
+function delCliente(cid){
+  const p=getPerfil(cid)||{};
+  if(!confirm(`Excluir "${p.nome||cid}" e todos os dados?`)) return;
+  localStorage.removeItem(`eo_perfil_${cid}`);
+  localStorage.removeItem(`eo_regs_${cid}`);
+  setClientes(getClientes().filter(c=>c.id!==cid));
+  if(curCid===cid) curCid=null;
+  toast('🗑 Cliente excluído.');renderTab();
+}
+function exportAll(){
+  const cl=getClientes();
+  const data={clientes:cl,perfis:{},registros:{}};
+  cl.forEach(c=>{data.perfis[c.id]=getPerfil(c.id);data.registros[c.id]=getRegs(c.id);});
+  const json=JSON.stringify(data,null,2);
+  if(navigator.clipboard) navigator.clipboard.writeText(json).then(()=>toast('📋 JSON copiado!')).catch(()=>toast('⚠️ Erro'));
+  else toast('⚠️ Clipboard indisponível');
+}
+function importJSON(){
+  const json=prompt('Cole o JSON de backup:');if(!json) return;
+  try{
+    const d=JSON.parse(json);if(!d.clientes||!d.perfis) throw new Error('Formato inválido');
+    d.clientes.forEach(c=>{if(d.perfis[c.id]) setPerfil(c.id,d.perfis[c.id]);if(d.registros&&d.registros[c.id]) setRegs(c.id,d.registros[c.id]);});
+    setClientes(d.clientes);toast('✅ Importado!');renderTab();
+  }catch(e){toast('❌ JSON inválido: '+e.message);}
+}
+function limparTodosRegs(){
+  if(!confirm('Limpar TODOS os registros?')) return;
+  getClientes().forEach(c=>setRegs(c.id,[]));toast('🗑 Registros excluídos.');renderDados();
+}
+function delTodosClientes(){
+  if(!confirm('⚠️ Excluir TODOS os clientes?')) return;
+  getClientes().forEach(c=>{localStorage.removeItem(`eo_perfil_${c.id}`);localStorage.removeItem(`eo_regs_${c.id}`);});
+  setClientes([]);curCid=null;toast('🗑 Clientes excluídos.');renderTab();
+}
+function factoryReset(){
+  if(!confirm('⚠️ FACTORY RESET — apagar TUDO?')) return;
+  localStorage.clear();toast('💥 Reset.');setTimeout(()=>location.reload(),1200);
+}
+function alterarSenha(){
+  const p1=(document.getElementById('newPw1').value||'').trim();
+  const p2=(document.getElementById('newPw2').value||'').trim();
+  if(p1.length<6){toast('⚠️ Mínimo 6 caracteres.');return;}
+  if(p1!==p2){toast('⚠️ Senhas não conferem.');return;}
+  setPw(p1);document.getElementById('newPw1').value='';document.getElementById('newPw2').value='';
+  toast('✅ Senha alterada!');
+}
+
+/* ══════════════════════════════════════════════
+   AUDIO ENGINE — Web Audio API
+   iOS Safari: AudioContext só funciona dentro de
+   um event handler síncrono de touchstart/click.
+   Por isso o splash é um <button> e o AudioContext
+   é criado e resumido DENTRO do handler.
+══════════════════════════════════════════════ */
+
+let _ctx = null;
+let _audioPlayed = false;
+
+function initAudio() {
+  // Cria o contexto DENTRO do evento de toque (obrigatório iOS)
+  if (!_ctx) {
+    try {
+      _ctx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) { return false; }
+  }
+  if (_ctx.state === 'suspended') {
+    _ctx.resume();
+  }
+  return _ctx.state !== 'closed';
+}
+
+function note(freq, start, dur, type, vol, atk, rel, bend) {
+  if (!_ctx) return;
+  type = type || 'sine'; vol = vol || 0.14; atk = atk || 0.04; rel = rel || 0.15; bend = bend || 0;
+  const t = _ctx.currentTime + start;
+  const osc = _ctx.createOscillator();
+  const env = _ctx.createGain();
+  const flt = _ctx.createBiquadFilter();
+  flt.type = 'lowpass'; flt.frequency.value = 3400; flt.Q.value = 0.7;
+  osc.connect(flt); flt.connect(env); env.connect(_ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t);
+  if (bend) osc.frequency.linearRampToValueAtTime(freq + bend, t + dur);
+  env.gain.setValueAtTime(0.001, t);
+  env.gain.linearRampToValueAtTime(vol, t + atk);
+  env.gain.setValueAtTime(vol, t + dur - rel);
+  env.gain.linearRampToValueAtTime(0.001, t + dur);
+  osc.start(t);
+  osc.stop(t + dur + 0.05);
+}
+
+function chord(freqs, start, dur, vol) {
+  freqs.forEach(function(f){ note(f, start, dur, 'sine', vol || 0.08, 0.06, 0.2); });
+}
+
+function playJingle() {
+  if (_audioPlayed) return;
+  if (!initAudio()) return; // falhou no iOS — silencioso
+  _audioPlayed = true;
+
+  // Sub-bass elétrico
+  note(55,  0.00, 0.85, 'triangle', 0.06, 0.10, 0.30);
+  note(110, 0.00, 0.85, 'triangle', 0.04, 0.10, 0.30);
+
+  // Acorde base Mi maior
+  chord([164.81, 207.65, 246.94], 0.08, 1.0, 0.06);
+
+  // Arpejo solar ascendente Mi3→Sol#3→Si3→Mi4→Sol#4→Si4
+  [329.63, 415.30, 493.88, 659.25, 830.61, 987.77].forEach(function(f, i) {
+    note(f, i * 0.13, 0.22, 'triangle', 0.12, 0.03, 0.08, 6);
+  });
+
+  // Resolução brilhante
+  chord([523.25, 659.25, 783.99, 1046.50], 1.05, 0.90, 0.07);
+  note(1318.51, 1.08, 0.70, 'triangle', 0.09, 0.05, 0.35, 18);
+
+  // Shimmer final
+  [2093, 2637, 3136].forEach(function(f, i) {
+    note(f, 1.18 + i * 0.05, 0.50, 'sine', 0.032, 0.03, 0.28);
+  });
+
+  // Fade final
+  note(659.25, 1.85, 0.55, 'sine', 0.05, 0.05, 0.45);
+}
+
+/* ─── splashTapped ───
+   Chamado pelo onclick do <button id="splash">
+   No iOS, onclick num <button> É um user gesture
+   válido para AudioContext */
+function splashTapped() {
+  // 1) Inicia áudio IMEDIATAMENTE (dentro do handler síncrono)
+  playJingle();
+
+  // 2) Fecha o splash após pequeno delay para o som começar
+  var sp = document.getElementById('splash');
+  if (!sp) return;
+  setTimeout(function() {
+    sp.classList.add('out');
+    setTimeout(function() {
+      if (sp.parentNode) sp.remove();
+      switchTab('visao');
+    }, 650);
+  }, 400);
+}
+
+/* ══════════════════════════════════════════════
+   SEED DEMO
+══════════════════════════════════════════════ */
+function seedDemo(){
+  if(getClientes().length) return;
+  const cl=[{id:'cli1',nome:'Guilherme Pereira',status:'ativo'},{id:'cli2',nome:'Ana Costa',status:'ativo'},{id:'cli3',nome:'Carlos Mendes',status:'pendente'}];
+  const perfis={
+    cli1:{...perfilDefault('Guilherme Pereira'),emoji:'👨',cor:'#1C6EFF',distribuidora:'ENEL',nrMedidor:'0438221',nrContrato:'12345678',tarifaFP:'0,65',tarifaInt:'0,87',tarifaPonta:'1,34',tarifaPadrao:'0.653',bandeira:'Verde',vencimentoDia:'10',meta:500},
+    cli2:{...perfilDefault('Ana Costa'),emoji:'👩',cor:'#10B981',distribuidora:'CEMIG',nrMedidor:'0987654',nrContrato:'87654321',tarifaFP:'0,72',tarifaInt:'0,95',tarifaPonta:'1,48',tarifaPadrao:'0.720',bandeira:'Verde',vencimentoDia:'15',meta:400,circ1Nome:'Ar-Condicionado',circ1Loc:'Sala',circ2Nome:'Geladeira',circ2Loc:'Cozinha',circ3Nome:'Escritório',circ3Loc:'Home office'},
+    cli3:{...perfilDefault('Carlos Mendes'),emoji:'🧑',cor:'#F59E0B',distribuidora:'CPFL',nrMedidor:'0555333',tarifaPadrao:'0.710',bandeira:'Amarela',status:'pendente',meta:350},
+  };
+  const regs={
+    cli1:[{id:'r1a',mes:'2025-04',producao:'420',consumo:'247',tarifa:'0.653',taxa:'50',parcela:'0',obs:'Mês ensolarado',saldo:'173',economia:'274.26',saldoFin:'224.26',autoSuf:'170.04',criado:new Date().toISOString()},{id:'r1b',mes:'2025-03',producao:'380',consumo:'290',tarifa:'0.653',taxa:'50',parcela:'0',obs:'',saldo:'90',economia:'248.14',saldoFin:'198.14',autoSuf:'131.03',criado:new Date().toISOString()},{id:'r1c',mes:'2025-02',producao:'310',consumo:'320',tarifa:'0.653',taxa:'50',parcela:'0',obs:'',saldo:'-10',economia:'202.43',saldoFin:'152.43',autoSuf:'96.88',criado:new Date().toISOString()}],
+    cli2:[{id:'r2a',mes:'2025-04',producao:'510',consumo:'380',tarifa:'0.720',taxa:'55',parcela:'300',obs:'Verão quente',saldo:'130',economia:'367.2',saldoFin:'12.2',autoSuf:'134.21',criado:new Date().toISOString()},{id:'r2b',mes:'2025-03',producao:'460',consumo:'350',tarifa:'0.720',taxa:'55',parcela:'300',obs:'',saldo:'110',economia:'331.2',saldoFin:'-23.8',autoSuf:'131.43',criado:new Date().toISOString()}],
+    cli3:[]
+  };
+  setClientes(cl);
+  Object.entries(perfis).forEach(([id,p])=>setPerfil(id,p));
+  Object.entries(regs).forEach(([id,r])=>setRegs(id,r));
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+window.addEventListener('load', function() {
+  seedDemo();
+  // Fallback: fecha o splash após 8s se o usuário não tocar
+  // (não toca áudio neste caso pois não há gesto)
+  setTimeout(function() {
+    var sp = document.getElementById('splash');
+    if (sp) {
+      sp.classList.add('out');
+      setTimeout(function(){ if(sp.parentNode) sp.remove(); switchTab('visao'); }, 650);
+    }
+  }, 8000);
+});
+// Anti-zoom iOS — usa threshold maior para não bloquear toque no splash
+var _lte = 0;
+document.addEventListener('touchend', function(e) {
+  var n = Date.now();
+  if (n - _lte <= 200) e.preventDefault();
+  _lte = n;
+}, { passive: false });
+</script>
+</body>
+</html>
