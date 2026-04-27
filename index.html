@@ -1158,91 +1158,94 @@ function renderEditar(){
 
   el.innerHTML=`
     ${clienteBar(cid,p,'Editar perfil')}
-
-    <!-- UPLOAD DE FATURA PDF -->
     <div class="sec">
-      <div class="sec-title">📄 Importar Fatura de Energia</div>
+      <div class="sec-title">\u{1F4C4} Importar Fatura</div>
       <div style="background:linear-gradient(135deg,rgba(28,110,255,.06),rgba(14,165,233,.03));border:1.5px solid rgba(28,110,255,.15);border-radius:18px;padding:16px;text-align:center">
-        <div style="font-size:36px;margin-bottom:8px">📄</div>
+        <div style="font-size:36px;margin-bottom:8px">\u{1F4C4}</div>
         <div style="font-size:14px;font-weight:700;color:#1C6EFF;margin-bottom:4px">Enviar fatura PDF</div>
-        <div style="font-size:12px;color:#9BA8B5;margin-bottom:14px;line-height:1.5">Preenche automaticamente nome, distribuidora, medidor, consumo e tarifas</div>
+        <div style="font-size:12px;color:#9BA8B5;margin-bottom:14px;line-height:1.5">Preenche campos automaticamente</div>
         <input type="file" id="pdfUpload" accept="application/pdf" style="display:none" onchange="handlePdfUpload(event,'${cid}')">
-        <button class="btn btn-p" style="max-width:240px;margin:0 auto;display:block;padding:13px 24px" onclick="document.getElementById('pdfUpload').click()">📤 Selecionar PDF</button>
+        <button class="btn btn-p" style="max-width:240px;margin:0 auto;display:block;padding:13px 24px" onclick="document.getElementById('pdfUpload').click()">\u{1F4E4} Selecionar PDF</button>
         <div id="pdfStatus" style="margin-top:10px;font-size:12px;color:#9BA8B5;min-height:18px"></div>
       </div>
     </div>
-
-    <!-- FORMULÁRIO DE EDIÇÃO -->
-    <div class="sec">
-      <div class="sec-title">👤 Identidade</div>
-      <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
-        ${editField('ed_nome','👤 Nome completo',p.nome,'Nome do cliente')}
-        ${editField('ed_emoji','🎭 Emoji/Avatar',p.emoji,'Ex: 👨')}
-        ${editField('ed_cor','🎨 Cor (hex)',p.cor,'Ex: #1C6EFF')}
-        ${editField('ed_saudacao','😊 Saudação',p.saudacao,'Ex: 👋')}
-        ${editField('ed_obs','📝 Obs. internas',p.obs,'Notas para o admin')}
-        <div>
-          <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">📌 Status</label>
-          <select id="ed_status" style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:15px;font-family:inherit;color:#0F1923;-webkit-appearance:none;outline:none">
-            ${STATUS.map(s=>'<option value="'+s+'"'+(p.status===s?' selected':'')+'>'+s+'</option>').join('')}
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-title">⚡ Conta de Energia</div>
-      <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
-        ${editField('ed_distribuidora','🏢 Distribuidora',p.distribuidora,'Neoenergia, ENEL...')}
-        ${editField('ed_nrContrato','📋 Nº Contrato / Cód. Cliente',p.nrContrato,'Ex: 7053253606')}
-        ${editField('ed_nrMedidor','🔢 Nº Medidor',p.nrMedidor,'Ex: 3226221599')}
-        ${editField('ed_nrInstalacao','🏠 Nº Instalação',p.nrInstalacao,'Ex: 9235709')}
-        ${editField('ed_classeConsumidor','👥 Classe',p.classeConsumidor,'Residencial')}
-        ${editField('ed_grupoTensao','⚡ Grupo de Tensão',p.grupoTensao,'Baixa Tensão')}
-        ${editField('ed_modalidade','📊 Modalidade',p.modalidade,'Conv. Monofásico')}
-        ${editField('ed_vencimentoDia','📅 Dia Vencimento',p.vencimentoDia,'Ex: 16')}
-      </div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-title">💰 Tarifas</div>
-      <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
-        ${editField('ed_tarifaFP','🟢 Fora Ponta (R$/kWh)',p.tarifaFP,'0,65')}
-        ${editField('ed_tarifaInt','🟡 Intermediária (R$/kWh)',p.tarifaInt,'0,87')}
-        ${editField('ed_tarifaPonta','🔴 Ponta (R$/kWh)',p.tarifaPonta,'1,34')}
-        ${editField('ed_tarifaPadrao','📌 Tarifa Padrão (R$/kWh)',p.tarifaPadrao,'0.653')}
-        <div>
-          <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">🚩 Bandeira</label>
-          <select id="ed_bandeira" style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:15px;font-family:inherit;color:#0F1923;-webkit-appearance:none;outline:none">
-            ${BANDEIRAS.map(b=>'<option value="'+b+'"'+(p.bandeira===b?' selected':'')+'>'+b+'</option>').join('')}
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-title">🎯 Meta</div>
-      <div class="card" style="padding:14px">
-        ${editField('ed_meta','🎯 Meta Mensal (kWh)',p.meta,'Ex: 500')}
-      </div>
-    </div>
-
-    <!-- BOTÃO SALVAR TUDO -->
-    <button class="btn btn-p" style="margin-bottom:12px;padding:18px;font-size:17px" onclick="salvarTudo('${cid}')">💾 Salvar Todas as Alterações</button>
-    <button class="btn btn-g" style="margin-bottom:20px" onclick="curCid=null;renderTab()">← Voltar</button>
+    <div class="sec"><div class="sec-title">\u{1F464} Identidade</div>
+    <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px">
+      ${editField('ed_nome','Nome completo','Nome do cliente')}
+      ${editField('ed_emoji','Emoji/Avatar','Ex: \u{1F468}')}
+      ${editField('ed_cor','Cor (hex)','Ex: #1C6EFF')}
+      ${editField('ed_saudacao','Saudação','Ex: \u{1F44B}')}
+      ${editField('ed_obs','Obs. internas','Notas')}
+      <div><label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">Status</label>
+      <select id="ed_status" style="width:100%;padding:13px 15px;background:#fff;border:1.5px solid #DDE3EC;border-radius:12px;font-size:16px;font-family:inherit;color:#0F1923;-webkit-appearance:none;outline:none">
+        ${STATUS.map(s=>'<option value="'+s+'">'+s+'</option>').join('')}
+      </select></div>
+    </div></div>
+    <div class="sec"><div class="sec-title">\u26A1 Conta de Energia</div>
+    <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px">
+      ${editField('ed_distribuidora','Distribuidora','Neoenergia, ENEL...')}
+      ${editField('ed_nrContrato','Cód. Cliente / Contrato','Ex: 7053253606')}
+      ${editField('ed_nrMedidor','Nº Medidor','Ex: 3226221599')}
+      ${editField('ed_nrInstalacao','Cód. Instalação','Ex: 9235709')}
+      ${editField('ed_classeConsumidor','Classe','Residencial')}
+      ${editField('ed_grupoTensao','Grupo de Tensão','Baixa Tensão')}
+      ${editField('ed_modalidade','Modalidade','Conv. Monofásico')}
+      ${editField('ed_vencimentoDia','Dia Vencimento','Ex: 16')}
+    </div></div>
+    <div class="sec"><div class="sec-title">\u{1F4B0} Tarifas</div>
+    <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px">
+      ${editField('ed_tarifaFP','Fora Ponta (R$/kWh)','0,65')}
+      ${editField('ed_tarifaInt','Intermediária (R$/kWh)','0,87')}
+      ${editField('ed_tarifaPonta','Ponta (R$/kWh)','1,34')}
+      ${editField('ed_tarifaPadrao','Tarifa Padrão (R$/kWh)','0.653')}
+      <div><label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">Bandeira</label>
+      <select id="ed_bandeira" style="width:100%;padding:13px 15px;background:#fff;border:1.5px solid #DDE3EC;border-radius:12px;font-size:16px;font-family:inherit;color:#0F1923;-webkit-appearance:none;outline:none">
+        ${BANDEIRAS.map(b=>'<option value="'+b+'">'+b+'</option>').join('')}
+      </select></div>
+    </div></div>
+    <div class="sec"><div class="sec-title">\u{1F3AF} Meta</div>
+    <div class="card" style="padding:16px">${editField('ed_meta','Meta Mensal (kWh)','Ex: 500')}</div></div>
+    <button class="btn btn-p" style="margin-bottom:12px;padding:18px;font-size:17px" onclick="salvarTudo('${cid}')">\u{1F4BE} Salvar Todas as Alterações</button>
+    <button class="btn btn-g" style="margin-bottom:20px" onclick="curCid=null;renderTab()">\u2190 Voltar</button>
   `;
+  // Preenche valores via JS após render (resolve problema iOS)
+  setTimeout(function(){ preencherCampos(cid); }, 50);
 }
 
-/* Campo editável simples */
-function editField(id, label, val, ph) {
+/* Campo editável simples — NÃO coloca value no HTML, preenche via JS depois */
+function editField(id, label, ph) {
   return '<div>'
     + '<label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">' + label + '</label>'
-    + '<input id="' + id + '" value="' + esc(val || '') + '" placeholder="' + (ph || '') + '" '
-    + 'style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;'
-    + 'font-size:15px;font-weight:600;font-family:inherit;color:#0F1923;outline:none;-webkit-appearance:none"'
-    + ' onfocus="this.style.borderColor=\'#1C6EFF\';this.style.boxShadow=\'0 0 0 3px rgba(28,110,255,.1)\'"'
-    + ' onblur="this.style.borderColor=\'#E8EDF4\';this.style.boxShadow=\'none\'">'
+    + '<input id="' + id + '" placeholder="' + (ph || '') + '" '
+    + 'style="width:100%;padding:13px 15px;background:#fff;border:1.5px solid #DDE3EC;border-radius:12px;'
+    + 'font-size:16px;font-weight:600;font-family:inherit;color:#0F1923;outline:none;-webkit-appearance:none"'
+    + ' onfocus="this.style.borderColor=\'#1C6EFF\';this.style.background=\'#FAFCFF\'"'
+    + ' onblur="this.style.borderColor=\'#DDE3EC\';this.style.background=\'#fff\'">'
     + '</div>';
+}
+
+/* Preenche os valores dos campos DEPOIS que o HTML foi inserido no DOM */
+function preencherCampos(cid) {
+  var p = getPerfil(cid) || perfilDefault('');
+  var campos = {
+    ed_nome: p.nome, ed_emoji: p.emoji, ed_cor: p.cor, ed_saudacao: p.saudacao,
+    ed_obs: p.obs, ed_distribuidora: p.distribuidora, ed_nrContrato: p.nrContrato,
+    ed_nrMedidor: p.nrMedidor, ed_nrInstalacao: p.nrInstalacao,
+    ed_classeConsumidor: p.classeConsumidor, ed_grupoTensao: p.grupoTensao,
+    ed_modalidade: p.modalidade, ed_vencimentoDia: p.vencimentoDia,
+    ed_tarifaFP: p.tarifaFP, ed_tarifaInt: p.tarifaInt,
+    ed_tarifaPonta: p.tarifaPonta, ed_tarifaPadrao: p.tarifaPadrao,
+    ed_meta: p.meta
+  };
+  for (var id in campos) {
+    var el = document.getElementById(id);
+    if (el && campos[id] != null) el.value = String(campos[id]);
+  }
+  // Selects
+  var selSt = document.getElementById('ed_status');
+  if (selSt) selSt.value = p.status || 'ativo';
+  var selBd = document.getElementById('ed_bandeira');
+  if (selBd) selBd.value = p.bandeira || 'Verde';
 }
 
 /* Salvar todos os campos de uma vez */
@@ -1260,21 +1263,17 @@ function salvarTudo(cid) {
     var inp = document.getElementById(fields[key]);
     if (inp) p[key] = inp.value.trim();
   }
-  // Status e bandeira (selects)
   var selStatus = document.getElementById('ed_status');
   if (selStatus) p.status = selStatus.value;
   var selBand = document.getElementById('ed_bandeira');
   if (selBand) p.bandeira = selBand.value;
 
   setPerfil(cid, p);
-
-  // Sync nome na lista de clientes
   var cl = getClientes();
   var idx = cl.findIndex(function(c){ return c.id === cid; });
   if (idx >= 0) { cl[idx].nome = p.nome; cl[idx].status = p.status; setClientes(cl); }
 
   toast('✅ Perfil salvo com sucesso!');
-  // Re-renderiza para mostrar os novos valores
   renderEditar();
 }
 
@@ -1285,87 +1284,90 @@ function handlePdfUpload(event, cid) {
   var file = event.target.files[0];
   if (!file) return;
   var status = document.getElementById('pdfStatus');
-  if (status) status.textContent = '⏳ Lendo fatura...';
+  if (status) status.textContent = '⏳ Lendo fatura com IA...';
 
   var reader = new FileReader();
   reader.onload = function(e) {
-    var text = '';
-    try {
-      // Tenta extrair texto do PDF (binário)
-      var bytes = new Uint8Array(e.target.result);
-      var raw = '';
-      for (var i = 0; i < bytes.length; i++) raw += String.fromCharCode(bytes[i]);
-      // Extrai strings legíveis do PDF
-      var matches = raw.match(/\(([^)]{2,200})\)/g);
-      if (matches) {
-        text = matches.map(function(m){ return m.slice(1,-1); }).join(' ');
+    var base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(e.target.result)));
+    
+    // Usa API do Claude para extrair dados do PDF
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: 'Extraia os dados desta fatura de energia elétrica brasileira. Responda APENAS com JSON puro (sem markdown, sem ```), no formato: {"nome":"","distribuidora":"","codCliente":"","medidor":"","codInstalacao":"","classe":"","modalidade":"","diaVencimento":"","bandeira":"","tarifaMedia":"","historico":[{"mes":"2026-04","consumo":425}]}. Para o histórico, converta ABR26 para 2026-04, MAR26 para 2026-03, etc.' }
+          ]
+        }]
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var text = '';
+      if (data.content) {
+        data.content.forEach(function(b){ if(b.type==='text') text += b.text; });
       }
-      // Também tenta streams de texto
-      var streams = raw.match(/BT[\s\S]*?ET/g);
-      if (streams) {
-        streams.forEach(function(s){
-          var tj = s.match(/\(([^)]+)\)/g);
-          if (tj) text += ' ' + tj.map(function(m){ return m.slice(1,-1); }).join(' ');
-        });
+      text = text.replace(/```json|```/g, '').trim();
+      
+      var parsed;
+      try { parsed = JSON.parse(text); } catch(e) {
+        if (status) status.innerHTML = '⚠️ Erro ao interpretar fatura. Preencha manualmente.';
+        return;
       }
-    } catch(err) {
-      text = '';
-    }
 
-    if (text.length < 20) {
-      if (status) status.innerHTML = '⚠️ Não foi possível ler o PDF automaticamente.<br>Preencha os campos manualmente.';
-      return;
-    }
-
-    // Parse inteligente dos dados da fatura
-    var parsed = parseFatura(text);
-    if (status) status.textContent = '✅ Fatura lida! Campos preenchidos.';
-
-    // Preenche os campos do formulário
-    var mapping = {
-      'ed_nome': parsed.nome,
-      'ed_distribuidora': parsed.distribuidora,
-      'ed_nrContrato': parsed.codCliente,
-      'ed_nrMedidor': parsed.medidor,
-      'ed_nrInstalacao': parsed.codInstalacao,
-      'ed_classeConsumidor': parsed.classe,
-      'ed_modalidade': parsed.modalidade,
-      'ed_vencimentoDia': parsed.diaVenc,
-      'ed_tarifaPadrao': parsed.tarifaMedia,
-    };
-    for (var id in mapping) {
-      if (mapping[id]) {
-        var inp = document.getElementById(id);
-        if (inp) inp.value = mapping[id];
+      // Preenche campos
+      var mapping = {
+        'ed_nome': parsed.nome,
+        'ed_distribuidora': parsed.distribuidora,
+        'ed_nrContrato': parsed.codCliente,
+        'ed_nrMedidor': parsed.medidor,
+        'ed_nrInstalacao': parsed.codInstalacao,
+        'ed_classeConsumidor': parsed.classe,
+        'ed_modalidade': parsed.modalidade,
+        'ed_vencimentoDia': parsed.diaVencimento,
+        'ed_tarifaPadrao': parsed.tarifaMedia,
+      };
+      for (var id in mapping) {
+        if (mapping[id]) {
+          var inp = document.getElementById(id);
+          if (inp) inp.value = mapping[id];
+        }
       }
-    }
-    // Bandeira
-    if (parsed.bandeira) {
-      var sel = document.getElementById('ed_bandeira');
-      if (sel) sel.value = parsed.bandeira;
-    }
+      if (parsed.bandeira) {
+        var sel = document.getElementById('ed_bandeira');
+        if (sel) sel.value = parsed.bandeira;
+      }
 
-    // Cria registros de histórico automaticamente
-    if (parsed.historico && parsed.historico.length > 0) {
-      var regs = getRegs(cid);
-      parsed.historico.forEach(function(h) {
-        var existing = regs.findIndex(function(r){ return r.mes === h.mes; });
+      // Importa histórico
+      if (parsed.historico && parsed.historico.length > 0) {
+        var regs = getRegs(cid);
         var tar = parsed.tarifaMedia ? parseFloat(parsed.tarifaMedia) : 0.65;
-        var consumo = h.consumo;
-        var economia = (consumo * tar).toFixed(2);
-        var reg = {
-          id: uid(), mes: h.mes, producao: '0', consumo: String(consumo),
-          tarifa: String(tar), taxa: '0', parcela: '0', obs: 'Importado da fatura',
-          saldo: String(-consumo), economia: '0', saldoFin: '0',
-          autoSuf: '0', criado: new Date().toISOString()
-        };
-        if (existing >= 0) regs[existing] = reg; else regs.push(reg);
-      });
-      setRegs(cid, regs);
-      if (status) status.textContent = '✅ Fatura lida! ' + parsed.historico.length + ' meses importados.';
-    }
-
-    toast('📄 Fatura importada!');
+        parsed.historico.forEach(function(h) {
+          var existing = regs.findIndex(function(r){ return r.mes === h.mes; });
+          var cons = parseInt(h.consumo) || 0;
+          var reg = {
+            id: uid(), mes: h.mes, producao: '0', consumo: String(cons),
+            tarifa: String(tar), taxa: '0', parcela: '0', obs: 'Importado da fatura',
+            saldo: String(-cons), economia: '0', saldoFin: '0',
+            autoSuf: '0', criado: new Date().toISOString()
+          };
+          if (existing >= 0) regs[existing] = reg; else regs.push(reg);
+        });
+        setRegs(cid, regs);
+        if (status) status.textContent = '✅ Fatura importada! ' + parsed.historico.length + ' meses de consumo.';
+      } else {
+        if (status) status.textContent = '✅ Dados do cliente importados!';
+      }
+      toast('📄 Fatura importada com sucesso!');
+    })
+    .catch(function(err) {
+      if (status) status.innerHTML = '⚠️ Erro na leitura: ' + err.message + '<br>Preencha manualmente.';
+    });
   };
   reader.readAsArrayBuffer(file);
 }
