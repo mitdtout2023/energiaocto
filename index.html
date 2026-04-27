@@ -1271,8 +1271,16 @@ function renderDados(){
    HELPERS HTML
 ══════════════════════════════════════════════ */
 function fRow(cid,field,icon,title,val,ph){
-  return `<div class="arow"><div class="arow-ico" style="background:#F7F9FC">${icon}</div><div class="arow-info"><div class="arow-title">${title}</div><div class="arow-sub" id="sub_${cid}_${field}">${esc(val)||'—'}</div></div></div>
-  <div class="field-wrap"><div class="field-inner"><input class="field-inp" id="inp_${cid}_${field}" placeholder="${ph}" value="${esc(val||'')}"><button class="field-save" onclick="saveField('${cid}','${field}','inp_${cid}_${field}','sub_${cid}_${field}')">✓</button></div></div>`;
+  return `<div class="arow" style="flex-wrap:wrap;gap:8px">
+    <div class="arow-ico" style="background:#F7F9FC;flex-shrink:0">${icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:700;color:#6B7A8D;margin-bottom:5px">${title}</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input class="field-inp" id="inp_${cid}_${field}" placeholder="${ph||title}" value="${esc(val||'')}" style="flex:1;padding:11px 13px;font-size:14px;font-weight:600;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:11px;font-family:inherit;outline:none;color:#0F1923;-webkit-appearance:none" onfocus="this.style.borderColor='#1C6EFF';this.style.boxShadow='0 0 0 3px rgba(28,110,255,.1)'" onblur="this.style.borderColor='#E8EDF4';this.style.boxShadow='none'">
+        <button class="field-save" onclick="saveField('${cid}','${field}','inp_${cid}_${field}','_none')" style="padding:11px 16px;border-radius:11px;font-size:13px">✓</button>
+      </div>
+    </div>
+  </div>`;
 }
 function togRow(cid,field,icon,title,val){
   return `<div class="arow"><div class="arow-ico" style="background:#F7F9FC">${icon}</div><div class="arow-info"><div class="arow-title">${title}</div><div class="arow-sub" id="ts_${cid}_${field}">${val?'✅ Visível':'⛔ Oculto'}</div></div><button class="tog ${val?'on':'off'}" id="tt_${cid}_${field}" onclick="togField('${cid}','${field}')"></button></div>`;
@@ -1294,12 +1302,16 @@ function pickerHtml(tab){
    AÇÕES
 ══════════════════════════════════════════════ */
 function saveField(cid,field,inpId,subId){
-  const val=document.getElementById(inpId).value.trim();
+  const inp=document.getElementById(inpId);
+  if(!inp) return;
+  const val=inp.value.trim();
   const p=getPerfil(cid)||perfilDefault('');p[field]=val;setPerfil(cid,p);
-  const sub=document.getElementById(subId);if(sub) sub.textContent=val||'—';
+  // Atualiza sub se existir
+  if(subId && subId!=='_none'){const sub=document.getElementById(subId);if(sub) sub.textContent=val||'—';}
+  // Sync nome na lista de clientes
   const cl=getClientes();const idx=cl.findIndex(c=>c.id===cid);
   if(idx>=0&&field==='nome'){cl[idx].nome=val;setClientes(cl);}
-  toast('✅ Salvo!');
+  toast('✅ '+field+' salvo!');
 }
 function saveSel(cid,field,inpId,subId,msg){
   const val=document.getElementById(inpId).value;
