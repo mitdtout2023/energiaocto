@@ -184,19 +184,21 @@ body{
   position:fixed;inset:0;z-index:800;
   background:rgba(6,13,26,.85);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  display:flex;align-items:flex-end;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
   animation:mfade .25s ease;
 }
 @keyframes mfade{from{opacity:0}to{opacity:1}}
 .auth-sheet{
   background:#fff;
-  border-radius:28px 28px 0 0;
-  padding:8px 24px calc(28px + env(safe-area-inset-bottom));
-  width:100%;
+  border-radius:28px;
+  padding:32px 24px 28px;
+  width:100%;max-width:380px;
   animation:mup .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 32px 80px rgba(0,0,0,.4);
 }
-@keyframes mup{from{transform:translateY(100%)}to{transform:none}}
-.auth-handle{width:40px;height:4px;background:#E4E8F0;border-radius:2px;margin:12px auto 24px}
+@keyframes mup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.auth-handle{display:none}
 .auth-icon{font-size:44px;text-align:center;margin-bottom:10px}
 .auth-title{font-size:22px;font-weight:900;color:#0F1923;text-align:center;letter-spacing:-.5px;margin-bottom:4px}
 .auth-sub{font-size:13px;color:#9BA8B5;text-align:center;margin-bottom:24px;line-height:1.5}
@@ -204,7 +206,7 @@ body{
 .auth-pw-inp{
   width:100%;padding:16px 52px 16px 18px;
   background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:16px;
-  font-size:22px;letter-spacing:4px;text-align:center;
+  font-size:18px;letter-spacing:2px;text-align:center;
   outline:none;font-family:inherit;color:#0F1923;
   -webkit-appearance:none;transition:border-color .2s,box-shadow .2s;
 }
@@ -447,6 +449,8 @@ body{
 .lock-view-title{font-size:18px;font-weight:800;color:#0F1923;margin-bottom:6px}
 .lock-view-sub{font-size:13.5px;color:#9BA8B5;line-height:1.6;margin-bottom:24px}
 </style>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj4KPHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIHJ4PSI0MCIgZmlsbD0iIzBBMTYyOCIvPgo8ZGVmcz4KPHJhZGlhbEdyYWRpZW50IGlkPSJzIiBjeD0iNTAlIiBjeT0iMzUlIiByPSI0NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkQwNjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGRjhDMjgiLz48L3JhZGlhbEdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9ImIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkY2RkEzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRTAzOTdBIi8+PC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjYyIiByPSIyMCIgZmlsbD0idXJsKCNzKSIgb3BhY2l0eT0iLjkiLz4KPGVsbGlwc2UgY3g9IjkwIiBjeT0iOTAiIHJ4PSIyOCIgcnk9IjI0IiBmaWxsPSJ1cmwoI2IpIi8+CjxlbGxpcHNlIGN4PSI4MiIgY3k9Ijg2IiByeD0iMTAiIHJ5PSI2IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LC4yNSkiIHRyYW5zZm9ybT0icm90YXRlKC0xNSw4Miw4NikiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSI4OCIgcj0iNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI4OCIgcj0iNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz4KPGNpcmNsZSBjeD0iODEuNSIgY3k9Ijg5IiByPSIyLjUiIGZpbGw9IiMzQjFBNUEiLz48Y2lyY2xlIGN4PSIxMDEuNSIgY3k9Ijg5IiByPSIyLjUiIGZpbGw9IiMzQjFBNUEiLz4KPGNpcmNsZSBjeD0iODMiIGN5PSI4Ny41IiByPSIxIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTAzIiBjeT0iODcuNSIgcj0iMSIgZmlsbD0iI2ZmZiIvPgo8ZyBmaWxsPSJ1cmwoI2IpIiBvcGFjaXR5PSIuODUiPgo8cGF0aCBkPSJNNjYgMTEwIFE1OCAxMTggNjEgMTI4IFE2NCAxMzIgNjcgMTI5IFE2OSAxMjUgNjggMTE5WiIvPgo8cGF0aCBkPSJNNzQgMTEzIFE2OSAxMjAgNzIgMTMwIFE3NSAxMzQgNzggMTMxIFE3OSAxMjcgNzcgMTIxWiIvPgo8cGF0aCBkPSJNODQgMTE1IFE4MyAxMjMgODUgMTMyIFE4OCAxMzYgOTAgMTMzIFE5MSAxMjggODkgMTIyWiIvPgo8cGF0aCBkPSJNOTYgMTE1IFE5NyAxMjMgOTUgMTMyIFE5MiAxMzYgOTAgMTMzIFE4OSAxMjggOTEgMTIyWiIvPgo8cGF0aCBkPSJNMTA2IDExMyBRMTExIDEyMCAxMDggMTMwIFExMDUgMTM0IDEwMiAxMzEgUTEwMSAxMjcgMTAzIDEyMVoiLz4KPHBhdGggZD0iTTExNCAxMTAgUTEyMiAxMTggMTE5IDEyOCBRMTE2IDEzMiAxMTMgMTI5IFExMTEgMTI1IDExMiAxMTlaIi8+CjwvZz4KPHRleHQgeD0iOTAiIHk9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsLjUpIj5BRE1JTjwvdGV4dD4KPC9zdmc+">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj4KPHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIHJ4PSI0MCIgZmlsbD0iIzBBMTYyOCIvPgo8ZGVmcz4KPHJhZGlhbEdyYWRpZW50IGlkPSJzIiBjeD0iNTAlIiBjeT0iMzUlIiByPSI0NSUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkQwNjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGRjhDMjgiLz48L3JhZGlhbEdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9ImIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkY2RkEzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRTAzOTdBIi8+PC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjYyIiByPSIyMCIgZmlsbD0idXJsKCNzKSIgb3BhY2l0eT0iLjkiLz4KPGVsbGlwc2UgY3g9IjkwIiBjeT0iOTAiIHJ4PSIyOCIgcnk9IjI0IiBmaWxsPSJ1cmwoI2IpIi8+CjxlbGxpcHNlIGN4PSI4MiIgY3k9Ijg2IiByeD0iMTAiIHJ5PSI2IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LC4yNSkiIHRyYW5zZm9ybT0icm90YXRlKC0xNSw4Miw4NikiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSI4OCIgcj0iNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI4OCIgcj0iNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz4KPGNpcmNsZSBjeD0iODEuNSIgY3k9Ijg5IiByPSIyLjUiIGZpbGw9IiMzQjFBNUEiLz48Y2lyY2xlIGN4PSIxMDEuNSIgY3k9Ijg5IiByPSIyLjUiIGZpbGw9IiMzQjFBNUEiLz4KPGNpcmNsZSBjeD0iODMiIGN5PSI4Ny41IiByPSIxIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTAzIiBjeT0iODcuNSIgcj0iMSIgZmlsbD0iI2ZmZiIvPgo8ZyBmaWxsPSJ1cmwoI2IpIiBvcGFjaXR5PSIuODUiPgo8cGF0aCBkPSJNNjYgMTEwIFE1OCAxMTggNjEgMTI4IFE2NCAxMzIgNjcgMTI5IFE2OSAxMjUgNjggMTE5WiIvPgo8cGF0aCBkPSJNNzQgMTEzIFE2OSAxMjAgNzIgMTMwIFE3NSAxMzQgNzggMTMxIFE3OSAxMjcgNzcgMTIxWiIvPgo8cGF0aCBkPSJNODQgMTE1IFE4MyAxMjMgODUgMTMyIFE4OCAxMzYgOTAgMTMzIFE5MSAxMjggODkgMTIyWiIvPgo8cGF0aCBkPSJNOTYgMTE1IFE5NyAxMjMgOTUgMTMyIFE5MiAxMzYgOTAgMTMzIFE4OSAxMjggOTEgMTIyWiIvPgo8cGF0aCBkPSJNMTA2IDExMyBRMTExIDEyMCAxMDggMTMwIFExMDUgMTM0IDEwMiAxMzEgUTEwMSAxMjcgMTAzIDEyMVoiLz4KPHBhdGggZD0iTTExNCAxMTAgUTEyMiAxMTggMTE5IDEyOCBRMTE2IDEzMiAxMTMgMTI5IFExMTEgMTI1IDExMiAxMTlaIi8+CjwvZz4KPHRleHQgeD0iOTAiIHk9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsLjUpIj5BRE1JTjwvdGV4dD4KPC9zdmc+">
 </head>
 <body>
 
@@ -552,7 +556,7 @@ body{
     <div class="auth-sub">Digite a senha para liberar as ações administrativas</div>
     <div class="auth-pw-wrap">
       <input class="auth-pw-inp" type="password" id="authPwInp"
-        placeholder="••••••••" autocomplete="off" inputmode="none"
+        placeholder="Digite a senha" autocomplete="current-password"
         onkeydown="if(event.key==='Enter')doAuth()">
       <button class="auth-pw-eye" id="authPwEye" onclick="toggleAuthPw()">👁</button>
     </div>
