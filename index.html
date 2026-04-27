@@ -1907,18 +1907,18 @@ function closeSplash() {
   _splashDone = true;
   var sp = document.getElementById('splash');
   if (!sp) { switchTab('visao'); return; }
-  sp.classList.add('out');
+  sp.style.opacity='0';
+  sp.style.pointerEvents='none';
+  sp.style.transition='opacity .5s ease';
   setTimeout(function() {
-    if (sp.parentNode) sp.parentNode.removeChild(sp);
+    sp.style.display='none';
     switchTab('visao');
   }, 600);
 }
 
 function splashTapped() {
-  // Tenta tocar áudio (user gesture)
   try { playJingle(); } catch(e) {}
-  // Fecha splash
-  setTimeout(closeSplash, 300);
+  closeSplash();
 }
 
 /* ══════════════════════════════════════════════
