@@ -23,22 +23,20 @@ html{
 body{
   font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;
   background:#F2F4F8;color:#0F1923;
-  /* Usa fill-available para cobrir 100% da tela no iPhone */
   min-height:100vh;
   min-height:-webkit-fill-available;
   height:100dvh;
   max-height:100dvh;
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
-  /* Safe area para Dynamic Island e barra home */
   padding-top:env(safe-area-inset-top);
   padding-bottom:env(safe-area-inset-bottom);
   padding-left:env(safe-area-inset-left);
   padding-right:env(safe-area-inset-right);
-  user-select:none;-webkit-user-select:none;
-  /* Evita bounce scroll no iOS */
-  position:fixed;
+  /* NÃO usa position:fixed nem user-select:none 
+     pois bloqueia inputs no iOS Safari */
   width:100%;
+  margin:0;
 }
 
 /* ══════════════════════════════════════════
@@ -241,7 +239,7 @@ body{
 /* ══════════════════════════════════════════
    APP SHELL
 ══════════════════════════════════════════ */
-#app{display:flex;flex-direction:column;height:100%;max-height:100%;overflow:hidden;position:relative}
+#app{display:flex;flex-direction:column;height:100dvh;max-height:100dvh;overflow:hidden;position:relative}
 
 /* ── TOPBAR ── */
 .topbar{
