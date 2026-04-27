@@ -1028,6 +1028,8 @@ function renderClientes(){
       <div class="sum-card"><div class="sum-lbl">Economia</div><div class="sum-val green" style="font-size:17px">${R(totalEcon)}</div></div>
     </div>
     <button class="btn btn-p" style="margin-bottom:16px" onclick="novoCliente()">+ Novo Cliente</button>
+    <button class="btn" style="margin-bottom:16px;margin-top:-8px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;box-shadow:0 4px 16px rgba(245,158,11,.3)" onclick="document.getElementById('pdfUpload').click()">📄 Importar Fatura PDF</button>
+    <input type="file" id="pdfUpload" accept=".pdf" style="display:none" onchange="handlePdfUpload(event)">
     ${cards}`;
 }
 
@@ -1142,44 +1144,305 @@ function delReg(cid,rid){
 }
 
 /* ══════════════════════════════════════════════
-   ABA EDITAR
+   ABA EDITAR — formulário completo com Salvar Tudo
 ══════════════════════════════════════════════ */
 function selectAndEdit(cid){curCid=cid;switchTab('editar');}
+
 function renderEditar(){
   const el=document.getElementById('tabBody');
   if(!curCid){el.innerHTML=pickerHtml('editar');return;}
-  const cid=curCid;const p=getPerfil(cid)||perfilDefault('');
+  const cid=curCid;
+  const p=getPerfil(cid)||perfilDefault('');
   const STATUS=['ativo','inativo','pendente'];
+  const BANDEIRAS=['Verde','Amarela','Vermelha 1','Vermelha 2','Escassez'];
+
   el.innerHTML=`
     ${clienteBar(cid,p,'Editar perfil')}
-    <div class="sec"><div class="sec-title">👤 Identidade</div><div class="acard">
-      ${fRow(cid,'emoji','🎭','Emoji/Avatar',p.emoji,'')}
-      ${fRow(cid,'cor','🎨','Cor (hex)',p.cor,'Ex: #1C6EFF')}
-      ${fRow(cid,'nome','👤','Nome completo',p.nome,'Nome do cliente')}
-      ${fRow(cid,'saudacao','😊','Saudação',p.saudacao,'Ex: 👋')}
-      ${fRow(cid,'obs','📝','Obs. internas',p.obs,'Notas para o admin')}
-      <div class="arow"><div class="arow-ico" style="background:#F7F9FC">📌</div><div class="arow-info"><div class="arow-title">Status</div><div class="arow-sub" id="sub_${cid}_status">${p.status||'ativo'}</div></div></div>
-      <div class="field-wrap"><div class="field-inner"><select class="field-inp" id="inp_${cid}_status">${STATUS.map(s=>`<option value="${s}"${p.status===s?' selected':''}>${s}</option>`).join('')}</select><button class="field-save" onclick="saveSel('${cid}','status','inp_${cid}_status','sub_${cid}_status','Status atualizado!')">✓</button></div></div>
-    </div></div>
-    <div class="sec"><div class="sec-title">⚡ Conta de Energia</div><div class="acard">
-      ${fRow(cid,'distribuidora','🏢','Distribuidora',p.distribuidora,'CEMIG, ENEL...')}
-      ${fRow(cid,'nrContrato','📋','Nº Contrato',p.nrContrato,'Ex: 123456789')}
-      ${fRow(cid,'nrMedidor','🔢','Nº Medidor',p.nrMedidor,'Ex: 0438221')}
-      ${fRow(cid,'nrInstalacao','🏠','Nº Instalação',p.nrInstalacao,'Ex: 3001234567')}
-      ${fRow(cid,'classeConsumidor','👥','Classe',p.classeConsumidor,'Residencial')}
-      ${fRow(cid,'grupoTensao','⚡','Grupo Tensão',p.grupoTensao,'Baixa Tensão')}
-      ${fRow(cid,'modalidade','📊','Modalidade',p.modalidade,'Convencional')}
-      ${fRow(cid,'vencimentoDia','📅','Dia Vencimento',p.vencimentoDia,'Ex: 10')}
-    </div></div>
-    <div class="sec"><div class="sec-title">💰 Tarifas</div><div class="acard">
-      ${fRow(cid,'tarifaFP','🟢','Fora Ponta (R$/kWh)',p.tarifaFP,'0,65')}
-      ${fRow(cid,'tarifaInt','🟡','Intermediária (R$/kWh)',p.tarifaInt,'0,87')}
-      ${fRow(cid,'tarifaPonta','🔴','Ponta (R$/kWh)',p.tarifaPonta,'1,34')}
-      ${fRow(cid,'tarifaPadrao','📌','Tarifa Padrão (R$/kWh)',p.tarifaPadrao,'0.653')}
-      <div class="arow"><div class="arow-ico" style="background:#EDF7ED">🚩</div><div class="arow-info"><div class="arow-title">Bandeira</div><div class="arow-sub" id="sub_${cid}_bandeira">${BAND[p.bandeira]||p.bandeira}</div></div></div>
-      <div class="field-wrap"><div class="field-inner"><select class="field-inp" id="inp_${cid}_bandeira">${Object.entries(BAND).map(([v,l])=>`<option value="${v}"${p.bandeira===v?' selected':''}>${l}</option>`).join('')}</select><button class="field-save" onclick="saveBand('${cid}')">✓</button></div></div>
-    </div></div>
-    <div class="sec"><div class="sec-title">🎯 Meta</div><div class="acard">${fRow(cid,'meta','🎯','Meta Mensal (kWh)',p.meta,'Ex: 500')}</div></div>`;
+
+    <!-- UPLOAD DE FATURA PDF -->
+    <div class="sec">
+      <div class="sec-title">📄 Importar Fatura de Energia</div>
+      <div style="background:linear-gradient(135deg,rgba(28,110,255,.06),rgba(14,165,233,.03));border:1.5px solid rgba(28,110,255,.15);border-radius:18px;padding:16px;text-align:center">
+        <div style="font-size:36px;margin-bottom:8px">📄</div>
+        <div style="font-size:14px;font-weight:700;color:#1C6EFF;margin-bottom:4px">Enviar fatura PDF</div>
+        <div style="font-size:12px;color:#9BA8B5;margin-bottom:14px;line-height:1.5">Preenche automaticamente nome, distribuidora, medidor, consumo e tarifas</div>
+        <input type="file" id="pdfUpload" accept="application/pdf" style="display:none" onchange="handlePdfUpload(event,'${cid}')">
+        <button class="btn btn-p" style="max-width:240px;margin:0 auto;display:block;padding:13px 24px" onclick="document.getElementById('pdfUpload').click()">📤 Selecionar PDF</button>
+        <div id="pdfStatus" style="margin-top:10px;font-size:12px;color:#9BA8B5;min-height:18px"></div>
+      </div>
+    </div>
+
+    <!-- FORMULÁRIO DE EDIÇÃO -->
+    <div class="sec">
+      <div class="sec-title">👤 Identidade</div>
+      <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+        ${editField('ed_nome','👤 Nome completo',p.nome,'Nome do cliente')}
+        ${editField('ed_emoji','🎭 Emoji/Avatar',p.emoji,'Ex: 👨')}
+        ${editField('ed_cor','🎨 Cor (hex)',p.cor,'Ex: #1C6EFF')}
+        ${editField('ed_saudacao','😊 Saudação',p.saudacao,'Ex: 👋')}
+        ${editField('ed_obs','📝 Obs. internas',p.obs,'Notas para o admin')}
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">📌 Status</label>
+          <select id="ed_status" style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:15px;font-family:inherit;color:#0F1923;-webkit-appearance:none;outline:none">
+            ${STATUS.map(s=>'<option value="'+s+'"'+(p.status===s?' selected':'')+'>'+s+'</option>').join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">⚡ Conta de Energia</div>
+      <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+        ${editField('ed_distribuidora','🏢 Distribuidora',p.distribuidora,'Neoenergia, ENEL...')}
+        ${editField('ed_nrContrato','📋 Nº Contrato / Cód. Cliente',p.nrContrato,'Ex: 7053253606')}
+        ${editField('ed_nrMedidor','🔢 Nº Medidor',p.nrMedidor,'Ex: 3226221599')}
+        ${editField('ed_nrInstalacao','🏠 Nº Instalação',p.nrInstalacao,'Ex: 9235709')}
+        ${editField('ed_classeConsumidor','👥 Classe',p.classeConsumidor,'Residencial')}
+        ${editField('ed_grupoTensao','⚡ Grupo de Tensão',p.grupoTensao,'Baixa Tensão')}
+        ${editField('ed_modalidade','📊 Modalidade',p.modalidade,'Conv. Monofásico')}
+        ${editField('ed_vencimentoDia','📅 Dia Vencimento',p.vencimentoDia,'Ex: 16')}
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">💰 Tarifas</div>
+      <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+        ${editField('ed_tarifaFP','🟢 Fora Ponta (R$/kWh)',p.tarifaFP,'0,65')}
+        ${editField('ed_tarifaInt','🟡 Intermediária (R$/kWh)',p.tarifaInt,'0,87')}
+        ${editField('ed_tarifaPonta','🔴 Ponta (R$/kWh)',p.tarifaPonta,'1,34')}
+        ${editField('ed_tarifaPadrao','📌 Tarifa Padrão (R$/kWh)',p.tarifaPadrao,'0.653')}
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">🚩 Bandeira</label>
+          <select id="ed_bandeira" style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;font-size:15px;font-family:inherit;color:#0F1923;-webkit-appearance:none;outline:none">
+            ${BANDEIRAS.map(b=>'<option value="'+b+'"'+(p.bandeira===b?' selected':'')+'>'+b+'</option>').join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">🎯 Meta</div>
+      <div class="card" style="padding:14px">
+        ${editField('ed_meta','🎯 Meta Mensal (kWh)',p.meta,'Ex: 500')}
+      </div>
+    </div>
+
+    <!-- BOTÃO SALVAR TUDO -->
+    <button class="btn btn-p" style="margin-bottom:12px;padding:18px;font-size:17px" onclick="salvarTudo('${cid}')">💾 Salvar Todas as Alterações</button>
+    <button class="btn btn-g" style="margin-bottom:20px" onclick="curCid=null;renderTab()">← Voltar</button>
+  `;
+}
+
+/* Campo editável simples */
+function editField(id, label, val, ph) {
+  return '<div>'
+    + '<label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">' + label + '</label>'
+    + '<input id="' + id + '" value="' + esc(val || '') + '" placeholder="' + (ph || '') + '" '
+    + 'style="width:100%;padding:12px 14px;background:#F7F9FC;border:1.5px solid #E8EDF4;border-radius:12px;'
+    + 'font-size:15px;font-weight:600;font-family:inherit;color:#0F1923;outline:none;-webkit-appearance:none"'
+    + ' onfocus="this.style.borderColor=\'#1C6EFF\';this.style.boxShadow=\'0 0 0 3px rgba(28,110,255,.1)\'"'
+    + ' onblur="this.style.borderColor=\'#E8EDF4\';this.style.boxShadow=\'none\'">'
+    + '</div>';
+}
+
+/* Salvar todos os campos de uma vez */
+function salvarTudo(cid) {
+  var p = getPerfil(cid) || perfilDefault('');
+  var fields = {
+    nome:'ed_nome', emoji:'ed_emoji', cor:'ed_cor', saudacao:'ed_saudacao', obs:'ed_obs',
+    distribuidora:'ed_distribuidora', nrContrato:'ed_nrContrato', nrMedidor:'ed_nrMedidor',
+    nrInstalacao:'ed_nrInstalacao', classeConsumidor:'ed_classeConsumidor',
+    grupoTensao:'ed_grupoTensao', modalidade:'ed_modalidade', vencimentoDia:'ed_vencimentoDia',
+    tarifaFP:'ed_tarifaFP', tarifaInt:'ed_tarifaInt', tarifaPonta:'ed_tarifaPonta',
+    tarifaPadrao:'ed_tarifaPadrao', meta:'ed_meta'
+  };
+  for (var key in fields) {
+    var inp = document.getElementById(fields[key]);
+    if (inp) p[key] = inp.value.trim();
+  }
+  // Status e bandeira (selects)
+  var selStatus = document.getElementById('ed_status');
+  if (selStatus) p.status = selStatus.value;
+  var selBand = document.getElementById('ed_bandeira');
+  if (selBand) p.bandeira = selBand.value;
+
+  setPerfil(cid, p);
+
+  // Sync nome na lista de clientes
+  var cl = getClientes();
+  var idx = cl.findIndex(function(c){ return c.id === cid; });
+  if (idx >= 0) { cl[idx].nome = p.nome; cl[idx].status = p.status; setClientes(cl); }
+
+  toast('✅ Perfil salvo com sucesso!');
+  // Re-renderiza para mostrar os novos valores
+  renderEditar();
+}
+
+/* ══════════════════════════════════════════════
+   UPLOAD PDF — lê a fatura e preenche campos
+══════════════════════════════════════════════ */
+function handlePdfUpload(event, cid) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var status = document.getElementById('pdfStatus');
+  if (status) status.textContent = '⏳ Lendo fatura...';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = '';
+    try {
+      // Tenta extrair texto do PDF (binário)
+      var bytes = new Uint8Array(e.target.result);
+      var raw = '';
+      for (var i = 0; i < bytes.length; i++) raw += String.fromCharCode(bytes[i]);
+      // Extrai strings legíveis do PDF
+      var matches = raw.match(/\(([^)]{2,200})\)/g);
+      if (matches) {
+        text = matches.map(function(m){ return m.slice(1,-1); }).join(' ');
+      }
+      // Também tenta streams de texto
+      var streams = raw.match(/BT[\s\S]*?ET/g);
+      if (streams) {
+        streams.forEach(function(s){
+          var tj = s.match(/\(([^)]+)\)/g);
+          if (tj) text += ' ' + tj.map(function(m){ return m.slice(1,-1); }).join(' ');
+        });
+      }
+    } catch(err) {
+      text = '';
+    }
+
+    if (text.length < 20) {
+      if (status) status.innerHTML = '⚠️ Não foi possível ler o PDF automaticamente.<br>Preencha os campos manualmente.';
+      return;
+    }
+
+    // Parse inteligente dos dados da fatura
+    var parsed = parseFatura(text);
+    if (status) status.textContent = '✅ Fatura lida! Campos preenchidos.';
+
+    // Preenche os campos do formulário
+    var mapping = {
+      'ed_nome': parsed.nome,
+      'ed_distribuidora': parsed.distribuidora,
+      'ed_nrContrato': parsed.codCliente,
+      'ed_nrMedidor': parsed.medidor,
+      'ed_nrInstalacao': parsed.codInstalacao,
+      'ed_classeConsumidor': parsed.classe,
+      'ed_modalidade': parsed.modalidade,
+      'ed_vencimentoDia': parsed.diaVenc,
+      'ed_tarifaPadrao': parsed.tarifaMedia,
+    };
+    for (var id in mapping) {
+      if (mapping[id]) {
+        var inp = document.getElementById(id);
+        if (inp) inp.value = mapping[id];
+      }
+    }
+    // Bandeira
+    if (parsed.bandeira) {
+      var sel = document.getElementById('ed_bandeira');
+      if (sel) sel.value = parsed.bandeira;
+    }
+
+    // Cria registros de histórico automaticamente
+    if (parsed.historico && parsed.historico.length > 0) {
+      var regs = getRegs(cid);
+      parsed.historico.forEach(function(h) {
+        var existing = regs.findIndex(function(r){ return r.mes === h.mes; });
+        var tar = parsed.tarifaMedia ? parseFloat(parsed.tarifaMedia) : 0.65;
+        var consumo = h.consumo;
+        var economia = (consumo * tar).toFixed(2);
+        var reg = {
+          id: uid(), mes: h.mes, producao: '0', consumo: String(consumo),
+          tarifa: String(tar), taxa: '0', parcela: '0', obs: 'Importado da fatura',
+          saldo: String(-consumo), economia: '0', saldoFin: '0',
+          autoSuf: '0', criado: new Date().toISOString()
+        };
+        if (existing >= 0) regs[existing] = reg; else regs.push(reg);
+      });
+      setRegs(cid, regs);
+      if (status) status.textContent = '✅ Fatura lida! ' + parsed.historico.length + ' meses importados.';
+    }
+
+    toast('📄 Fatura importada!');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* Parse inteligente de texto extraído de fatura */
+function parseFatura(text) {
+  var r = { nome:'', distribuidora:'', codCliente:'', medidor:'', codInstalacao:'',
+            classe:'', modalidade:'', diaVenc:'', bandeira:'', tarifaMedia:'', historico:[] };
+
+  // Distribuidora
+  if (/neoenergia/i.test(text)) r.distribuidora = 'Neoenergia';
+  else if (/enel/i.test(text)) r.distribuidora = 'ENEL';
+  else if (/cemig/i.test(text)) r.distribuidora = 'CEMIG';
+  else if (/cpfl/i.test(text)) r.distribuidora = 'CPFL';
+  else if (/light/i.test(text)) r.distribuidora = 'Light';
+  else if (/equatorial/i.test(text)) r.distribuidora = 'Equatorial';
+  else if (/energisa/i.test(text)) r.distribuidora = 'Energisa';
+  else if (/coelba/i.test(text)) r.distribuidora = 'Coelba';
+  else if (/celpe/i.test(text)) r.distribuidora = 'CELPE';
+
+  // Nome do cliente
+  var nomeMatch = text.match(/NOME\s*(?:DO\s*)?CLIENTE[:\s]*([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ][A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ\s]{4,60})/i);
+  if (nomeMatch) r.nome = nomeMatch[1].trim();
+
+  // Código do cliente
+  var codMatch = text.match(/C[ÓO]DIGO\s*(?:DO\s*)?CLIENTE[:\s]*(\d{5,15})/i);
+  if (codMatch) r.codCliente = codMatch[1];
+
+  // Código da instalação
+  var instMatch = text.match(/C[ÓO]DIGO\s*(?:DA\s*)?INSTALA[ÇC][ÃA]O[:\s]*(\d{5,15})/i);
+  if (instMatch) r.codInstalacao = instMatch[1];
+
+  // Medidor
+  var medMatch = text.match(/MEDIDOR[:\s]*(\d{5,15})/i);
+  if (!medMatch) medMatch = text.match(/(\d{10})\s*Energia\s*Ativa/i);
+  if (medMatch) r.medidor = medMatch[1];
+
+  // Classe
+  if (/RESIDENCIAL/i.test(text)) r.classe = 'Residencial';
+  else if (/COMERCIAL/i.test(text)) r.classe = 'Comercial';
+  else if (/INDUSTRIAL/i.test(text)) r.classe = 'Industrial';
+  else if (/RURAL/i.test(text)) r.classe = 'Rural';
+
+  // Modalidade
+  if (/Monof[aá]sico/i.test(text)) r.modalidade = 'Conv. Monofásico';
+  else if (/Bif[aá]sico/i.test(text)) r.modalidade = 'Conv. Bifásico';
+  else if (/Trif[aá]sico/i.test(text)) r.modalidade = 'Conv. Trifásico';
+
+  // Vencimento
+  var vencMatch = text.match(/VENCIMENTO[:\s]*(\d{2})[\/\-](\d{2})[\/\-](\d{4})/i);
+  if (vencMatch) r.diaVenc = vencMatch[1];
+
+  // Bandeira
+  if (/bandeira.*Verde/i.test(text)) r.bandeira = 'Verde';
+  else if (/bandeira.*Amarela/i.test(text)) r.bandeira = 'Amarela';
+  else if (/bandeira.*Vermelha.*2/i.test(text)) r.bandeira = 'Vermelha 2';
+  else if (/bandeira.*Vermelha/i.test(text)) r.bandeira = 'Vermelha 1';
+
+  // Tarifa média (TUSD)
+  var tarMatch = text.match(/Consumo-TUSD\s*kWh\s*[\d,.]+\s*([\d,]+)/);
+  if (tarMatch) r.tarifaMedia = tarMatch[1].replace(',','.');
+
+  // Histórico de consumo mensal
+  var meses = {'JAN':'01','FEV':'02','MAR':'03','ABR':'04','MAI':'05','JUN':'06',
+               'JUL':'07','AGO':'08','SET':'09','OUT':'10','NOV':'11','DEZ':'12'};
+  var histRegex = /(JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)\s*(\d{2})\s+(\d{1,5})\s+\d{1,3}/gi;
+  var m;
+  while ((m = histRegex.exec(text)) !== null) {
+    var mesAbr = m[1].toUpperCase();
+    var ano = '20' + m[2];
+    var cons = parseInt(m[3]);
+    if (meses[mesAbr] && cons > 0 && cons < 9999) {
+      r.historico.push({ mes: ano + '-' + meses[mesAbr], consumo: cons });
+    }
+  }
+
+  return r;
 }
 
 /* ══════════════════════════════════════════════
@@ -1485,6 +1748,155 @@ function playJingle() {
   note(659.25, 1.85, 0.55, 'sine', 0.05, 0.05, 0.45);
 }
 
+/* ══════════════════════════════════════════════
+   IMPORTAR FATURA PDF
+══════════════════════════════════════════════ */
+function handlePdfUpload(event){
+  var file=event.target.files[0];
+  if(!file)return;
+  toast('📄 Processando fatura...');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var text=extractPdfText(new Uint8Array(e.target.result));
+      if(!text||text.length<30){toast('⚠️ PDF não legível.');return;}
+      var dados=parseFatura(text);
+      if(!dados.nome){toast('⚠️ Nome não encontrado no PDF.');return;}
+      criarClienteDaFatura(dados);
+    }catch(err){toast('❌ Erro: '+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+  event.target.value='';
+}
+
+function extractPdfText(bytes){
+  var s='',i;
+  for(i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+  var text='',m,m2;
+  // Strings em operadores Tj
+  var r1=/\(([^)]+)\)\s*Tj/g;
+  while((m=r1.exec(s))!==null) text+=m[1]+' ';
+  // Arrays TJ
+  var r2=/\[([^\]]*)\]\s*TJ/gi;
+  while((m=r2.exec(s))!==null){
+    var r3=/\(([^)]*)\)/g;
+    while((m2=r3.exec(m[1]))!==null) text+=m2[1];
+    text+=' ';
+  }
+  // Streams
+  var r4=/stream\r?\n([\s\S]*?)endstream/g;
+  while((m=r4.exec(s))!==null){
+    var r5=/\(([^)]{2,})\)/g;
+    while((m2=r5.exec(m[1]))!==null){
+      var t=m2[1].replace(/\\n/g,' ').replace(/\\/g,'');
+      if(/[A-Za-zÀ-ú0-9]/.test(t)) text+=t+' ';
+    }
+  }
+  return text;
+}
+
+function parseFatura(text){
+  var d={},t=text.replace(/\s+/g,' ');
+  // Nome
+  var nm=t.match(/NOME DO CLIENTE[:\s]*([A-ZÀ-Ú][A-ZÀ-Ú\s]{4,})/i);
+  if(nm) d.nome=nm[1].trim().replace(/\s+/g,' ');
+  if(!d.nome){nm=t.match(/(?:CLIENTE|PAGADOR)[:\s]*([A-ZÀ-Ú][A-ZÀ-Ú\s]{4,})/i);if(nm)d.nome=nm[1].trim().replace(/\s+/g,' ');}
+  // Distribuidora
+  var di=t.match(/(NEOENERGIA|CELPE|CEMIG|ENEL|CPFL|ENERGISA|EQUATORIAL|COELBA|LIGHT|ELEKTRO|EDP|COPEL|CELESC|RGE|COSERN)/i);
+  if(di)d.distribuidora=di[1].toUpperCase();
+  var df=t.match(/COMPANHIA[A-ZÀ-Ú\s]{5,}(?=\s*(?:AV|RUA|CNPJ))/i);
+  if(df)d.distribuidoraFull=df[0].trim();
+  // Instalação, Contrato, Medidor
+  var inst=t.match(/(?:INSTALA[ÇC][AÃ]O|C[ÓO]DIGO DA INSTALA)[A-ZÃO\s]*[:\s]*(\d{5,})/i);
+  if(inst)d.nrInstalacao=inst[1];
+  var cod=t.match(/C[ÓO]DIGO DO CLIENTE[:\s]*(\d{5,})/i);
+  if(cod)d.nrContrato=cod[1];
+  var med=t.match(/MEDIDOR[:\s]*(\d{5,})/i);
+  if(!med)med=t.match(/(\d{10})\s+Energia\s+Ativa/i);
+  if(med)d.nrMedidor=med[1];
+  // Classe
+  if(/RESIDENCIAL/i.test(t))d.classeConsumidor='Residencial';
+  else if(/COMERCIAL/i.test(t))d.classeConsumidor='Comercial';
+  else if(/INDUSTRIAL/i.test(t))d.classeConsumidor='Industrial';
+  // Tipo
+  if(/[Mm]onof/i.test(t))d.grupoTensao='Monofásico';
+  else if(/[Bb]if/i.test(t))d.grupoTensao='Bifásico';
+  else if(/[Tt]rif/i.test(t))d.grupoTensao='Trifásico';
+  // Vencimento
+  var vc=t.match(/VENCIMENTO[:\s]*(\d{2})[\/\-](\d{2})/i);
+  if(vc)d.vencimentoDia=vc[1];
+  // Bandeira
+  if(/bandeira.*Verde/i.test(t))d.bandeira='Verde';
+  else if(/bandeira.*Amarela/i.test(t))d.bandeira='Amarela';
+  else if(/bandeira.*Vermelha.*2/i.test(t))d.bandeira='Vermelha 2';
+  else if(/bandeira.*Vermelha/i.test(t))d.bandeira='Vermelha 1';
+  // Tarifa
+  var tar=t.match(/(\d+[,.]\d{5,})/);
+  if(tar)d.tarifaPadrao=tar[1].replace(',','.');
+  // Consumo atual
+  var cons=t.match(/kWh\s*(\d{2,5})[,.]00/);
+  if(cons)d.consumoAtual=parseInt(cons[1]);
+  // Ref mês/ano
+  var ref=t.match(/(\d{2})[\/](\d{4})/);
+  if(ref)d.mesRef=ref[2]+'-'+ref[1];
+  // Histórico
+  d.historico=[];
+  var mesMap={JAN:'01',FEV:'02',MAR:'03',ABR:'04',MAI:'05',JUN:'06',JUL:'07',AGO:'08',SET:'09',OUT:'10',NOV:'11',DEZ:'12'};
+  var hr=/(JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)\s*(\d{2})\s+(\d{2,4})\s+(\d{2,3})/gi;
+  var hm;
+  while((hm=hr.exec(t))!==null){
+    var mes=mesMap[hm[1].toUpperCase()]||'01';
+    var ano=hm[2].length===2?'20'+hm[2]:hm[2];
+    var kwh=parseInt(hm[3]);
+    if(kwh>0&&kwh<10000)d.historico.push({mes:ano+'-'+mes,consumo:kwh});
+  }
+  return d;
+}
+
+function criarClienteDaFatura(dados){
+  var id=uid();
+  var perfil=perfilDefault(dados.nome||'Novo Cliente');
+  if(dados.distribuidora)perfil.distribuidora=dados.distribuidoraFull||dados.distribuidora;
+  if(dados.nrInstalacao)perfil.nrInstalacao=dados.nrInstalacao;
+  if(dados.nrContrato)perfil.nrContrato=dados.nrContrato;
+  if(dados.nrMedidor)perfil.nrMedidor=dados.nrMedidor;
+  if(dados.classeConsumidor)perfil.classeConsumidor=dados.classeConsumidor;
+  if(dados.grupoTensao)perfil.grupoTensao=dados.grupoTensao;
+  if(dados.vencimentoDia)perfil.vencimentoDia=dados.vencimentoDia;
+  if(dados.bandeira)perfil.bandeira=dados.bandeira;
+  if(dados.tarifaPadrao)perfil.tarifaPadrao=dados.tarifaPadrao;
+  setPerfil(id,perfil);
+  var cl=getClientes();cl.push({id:id,nome:perfil.nome,status:'ativo'});setClientes(cl);
+  // Registros do histórico
+  var regs=[];
+  if(dados.historico&&dados.historico.length>0){
+    var tar=parseFloat(perfil.tarifaPadrao)||0.653;
+    dados.historico.forEach(function(h){
+      regs.push({id:uid(),mes:h.mes,producao:'0',consumo:String(h.consumo),
+        tarifa:String(tar),taxa:'0',parcela:'0',obs:'Importado da fatura',
+        saldo:String(-h.consumo),economia:'0',saldoFin:'0',autoSuf:'0',
+        criado:new Date().toISOString()});
+    });
+    setRegs(id,regs);
+  }
+  toast('✅ '+perfil.nome+' criado com '+regs.length+' registros!');
+  curCid=id;
+  // Resumo
+  var r='<div class="m-title">📄 Fatura Importada</div>';
+  r+='<div class="m-row"><span class="m-lbl">Nome</span><span class="m-val">'+esc(perfil.nome)+'</span></div>';
+  if(dados.distribuidora)r+='<div class="m-row"><span class="m-lbl">Distribuidora</span><span class="m-val">'+esc(perfil.distribuidora)+'</span></div>';
+  if(dados.nrContrato)r+='<div class="m-row"><span class="m-lbl">Cód. Cliente</span><span class="m-val">'+dados.nrContrato+'</span></div>';
+  if(dados.nrInstalacao)r+='<div class="m-row"><span class="m-lbl">Instalação</span><span class="m-val">'+dados.nrInstalacao+'</span></div>';
+  if(dados.nrMedidor)r+='<div class="m-row"><span class="m-lbl">Medidor</span><span class="m-val">'+dados.nrMedidor+'</span></div>';
+  if(dados.classeConsumidor)r+='<div class="m-row"><span class="m-lbl">Classe</span><span class="m-val">'+dados.classeConsumidor+'</span></div>';
+  if(dados.bandeira)r+='<div class="m-row"><span class="m-lbl">Bandeira</span><span class="m-val">'+dados.bandeira+'</span></div>';
+  if(dados.consumoAtual)r+='<div class="m-row"><span class="m-lbl">Consumo Atual</span><span class="m-val">'+dados.consumoAtual+' kWh</span></div>';
+  r+='<div class="m-row"><span class="m-lbl">Registros</span><span class="m-val">'+regs.length+' meses</span></div>';
+  r+='<div style="margin-top:16px"><button class="btn btn-p" onclick="closeMod();switchTab(\'editar\')">✏️ Editar Cliente</button></div>';
+  r+='<div style="margin-top:8px"><button class="btn btn-g" onclick="closeMod();renderClientes()">👥 Ver Clientes</button></div>';
+  openMod(r);
+}
+
 /* ─── SPLASH CONTROL ─── */
 var _splashDone = false;
 
@@ -1536,13 +1948,7 @@ window.addEventListener('load', function() {
   // Auto-fecha o splash após 2.5s (sem depender de toque)
   setTimeout(closeSplash, 2500);
 });
-// Anti-zoom iOS
-var _lte = 0;
-document.addEventListener('touchend', function(e) {
-  var n = Date.now();
-  if (n - _lte <= 200) e.preventDefault();
-  _lte = n;
-}, { passive: false });
+// Nota: NÃO usar touchend preventDefault pois bloqueia inputs no iOS
 </script>
 </body>
 </html>
