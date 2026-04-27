@@ -691,13 +691,15 @@ function doCloseSplash(){
   _splashDone = true;
   var sp=document.getElementById('splash');
   if(!sp) return;
-  sp.classList.add('out');
-  setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},600);
+  sp.style.opacity='0';
+  sp.style.pointerEvents='none';
+  sp.style.transition='opacity .5s ease';
+  setTimeout(function(){ sp.style.display='none'; },600);
 }
 
 function splashTapped(){
   try { playJingle(); } catch(e) {}
-  setTimeout(doCloseSplash, 300);
+  doCloseSplash();
 }
 
 /* INIT */
