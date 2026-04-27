@@ -763,10 +763,35 @@ window.addEventListener('load', function() {
       };
     } catch(e) {}
   }
-});
 
-// NÃO usar touchend preventDefault — bloqueia inputs no iOS
-},{passive:false});
+  // Fallback: detecta mudanças no localStorage de outra aba
+  window.addEventListener('storage', function(e) {
+    if (!window._ACTIVE_ID) return;
+    if (!e.key) return;
+    // Reage a mudanças no perfil ou registros deste cliente
+    if (e.key === 'eo_perfil_' + window._ACTIVE_ID || e.key === 'eo_regs_' + window._ACTIVE_ID) {
+      var scr = document.querySelector('.screen.active');
+      if (!scr) return;
+      var id = scr.id.replace('s-', '');
+      if (id === 'inicio') { renderInicio(); updateHeader(); }
+      if (id === 'consumo') renderConsumo();
+      if (id === 'fatura') renderFatura();
+      if (id === 'config') renderDicas();
+      toast('\uD83D\uDD04 Dados atualizados');
+    }
+    // Reage a novos clientes (lista)
+    if (e.key === 'eo_clientes') {
+      // Verifica se este cliente ainda existe
+      try {
+        var cl = JSON.parse(e.newValue || '[]');
+        var exists = cl.some(function(c){ return c.id === window._ACTIVE_ID; });
+        if (!exists && window._ACTIVE_ID !== 'demo_preview') {
+          toast('\u26A0\uFE0F Cliente removido pelo admin');
+        }
+      } catch(err) {}
+    }
+  });
+});
 
 </script>
 </body>
