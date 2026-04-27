@@ -1291,32 +1291,6 @@ function pickerHtml(tab){
 }
 
 /* ══════════════════════════════════════════════
-   SYNC — BroadcastChannel
-   Notifica o app cliente (mesma aba ou outras abas
-   do mesmo domínio) quando o admin salva algo.
-══════════════════════════════════════════════ */
-const _bc = (typeof BroadcastChannel !== 'undefined')
-  ? new BroadcastChannel('eo_sync') : null;
-
-function broadcastUpdate(type, cid) {
-  if (!_bc) return;
-  try { _bc.postMessage({ type, cid, ts: Date.now() }); } catch(e) {}
-}
-
-// Wrapper de setPerfil que notifica automaticamente
-const _origSetPerfil = setPerfil;
-function setPerfil(id, d) {
-  localStorage.setItem('eo_perfil_' + id, JSON.stringify(d));
-  broadcastUpdate('perfil', id);
-}
-// Wrapper de setRegs
-const _origSetRegs = setRegs;
-function setRegs(id, d) {
-  localStorage.setItem('eo_regs_' + id, JSON.stringify(d));
-  broadcastUpdate('regs', id);
-}
-
-/* ══════════════════════════════════════════════
    AÇÕES
 ══════════════════════════════════════════════ */
 function saveField(cid,field,inpId,subId){
@@ -1497,24 +1471,26 @@ function playJingle() {
   note(659.25, 1.85, 0.55, 'sine', 0.05, 0.05, 0.45);
 }
 
-/* ─── splashTapped ───
-   Chamado pelo onclick do <button id="splash">
-   No iOS, onclick num <button> É um user gesture
-   válido para AudioContext */
-function splashTapped() {
-  // 1) Inicia áudio IMEDIATAMENTE (dentro do handler síncrono)
-  playJingle();
+/* ─── SPLASH CONTROL ─── */
+var _splashDone = false;
 
-  // 2) Fecha o splash após pequeno delay para o som começar
+function closeSplash() {
+  if (_splashDone) return;
+  _splashDone = true;
   var sp = document.getElementById('splash');
-  if (!sp) return;
+  if (!sp) { switchTab('visao'); return; }
+  sp.classList.add('out');
   setTimeout(function() {
-    sp.classList.add('out');
-    setTimeout(function() {
-      if (sp.parentNode) sp.remove();
-      switchTab('visao');
-    }, 650);
-  }, 400);
+    if (sp.parentNode) sp.parentNode.removeChild(sp);
+    switchTab('visao');
+  }, 600);
+}
+
+function splashTapped() {
+  // Tenta tocar áudio (user gesture)
+  try { playJingle(); } catch(e) {}
+  // Fecha splash
+  setTimeout(closeSplash, 300);
 }
 
 /* ══════════════════════════════════════════════
@@ -1543,17 +1519,10 @@ function seedDemo(){
 ══════════════════════════════════════════════ */
 window.addEventListener('load', function() {
   seedDemo();
-  // Fallback: fecha o splash após 8s se o usuário não tocar
-  // (não toca áudio neste caso pois não há gesto)
-  setTimeout(function() {
-    var sp = document.getElementById('splash');
-    if (sp) {
-      sp.classList.add('out');
-      setTimeout(function(){ if(sp.parentNode) sp.remove(); switchTab('visao'); }, 650);
-    }
-  }, 8000);
+  // Auto-fecha o splash após 2.5s (sem depender de toque)
+  setTimeout(closeSplash, 2500);
 });
-// Anti-zoom iOS — usa threshold maior para não bloquear toque no splash
+// Anti-zoom iOS
 var _lte = 0;
 document.addEventListener('touchend', function(e) {
   var n = Date.now();
