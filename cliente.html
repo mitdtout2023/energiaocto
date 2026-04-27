@@ -763,9 +763,7 @@ window.addEventListener('load', function() {
   }
 });
 
-var _lte=0;
-document.addEventListener('touchend',function(e){
-  var n=Date.now();if(n-_lte<=200)e.preventDefault();_lte=n;
+// NÃO usar touchend preventDefault — bloqueia inputs no iOS
 },{passive:false});
 
 </script>
