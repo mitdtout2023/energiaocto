@@ -14,7 +14,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;background:#000}
 html{height:100%;height:-webkit-fill-available;background:#000;overflow:hidden}
-body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;background:#F2F4F8;color:#0F1923;min-height:100vh;min-height:-webkit-fill-available;height:100dvh;max-height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);user-select:none;-webkit-user-select:none;position:fixed;width:100%}
+body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;background:#F2F4F8;color:#0F1923;min-height:100vh;min-height:-webkit-fill-available;height:100dvh;max-height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);width:100%;margin:0}
 
 /* ── SPLASH ── */
 #splash{position:fixed;inset:0;top:0;left:0;right:0;bottom:0;z-index:9999;background:linear-gradient(170deg,#0D2B7E 0%,#1C6EFF 45%,#0A6B4B 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .55s,transform .55s;border:none;outline:none;padding:0;margin:0;width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -33,7 +33,7 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;background:
 #errState{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;background:#F2F4F8;text-align:center}
 
 /* ── APP SHELL ── */
-#app{display:flex;flex-direction:column;height:100%;max-height:100%;overflow:hidden;position:relative}
+#app{display:flex;flex-direction:column;height:100dvh;max-height:100dvh;overflow:hidden;position:relative}
 .hdr{flex-shrink:0;padding:14px 20px 12px;background:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,.06);position:relative;z-index:10}
 .hdr-logo{font-size:22px;font-weight:900;color:#0F1923;letter-spacing:-.6px;line-height:1}
 .hdr-logo span{color:#1C6EFF}
