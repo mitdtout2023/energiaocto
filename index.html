@@ -1075,10 +1075,11 @@ function openDet(cid){
     </div>
     <div class="link-box">
       <div class="link-box-title">📱 Link do App do Cliente</div>
-      <div class="link-url">${link}</div>
+      <input id="detLinkInput" value="${link}" style="width:100%;font-size:12px;color:#3A4A5C;word-break:break-all;line-height:1.5;background:#fff;border-radius:8px;padding:10px;border:1.5px solid #E8EDF4;font-family:monospace;outline:none;-webkit-appearance:none" onfocus="this.select()">
+      <div style="font-size:11px;color:#9BA8B5;margin-top:6px">Edite a URL acima se quiser personalizar o ID</div>
       <div class="link-actions">
-        <button class="btn btn-p btn-sm" style="flex:1" onclick="copyLink('${link}')">📋 Copiar</button>
-        <button class="btn btn-sm" style="flex:1;background:#EEF2F7;color:#6B7A8D;font-weight:700" onclick="window.open('${link}','_blank')">↗ Abrir</button>
+        <button class="btn btn-p btn-sm" style="flex:1" onclick="copyDetLink()">📋 Copiar</button>
+        <button class="btn btn-sm" style="flex:1;background:#EEF2F7;color:#6B7A8D;font-weight:700" onclick="openDetLink()">↗ Abrir</button>
       </div>
     </div>
     <div class="card" style="margin-bottom:14px">
@@ -1099,6 +1100,17 @@ function openEditFromDet(){closeDet();selectAndEdit(curCid);}
 function copyLink(url){
   if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>toast('📋 Link copiado!')).catch(()=>toast('⚠️ Erro'));
   else toast('⚠️ Copie manualmente');
+}
+function copyDetLink(){
+  var inp=document.getElementById('detLinkInput');
+  if(!inp) return;
+  var url=inp.value.trim();
+  if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>toast('📋 Link copiado!')).catch(()=>toast('⚠️ Erro'));
+  else { inp.select(); document.execCommand('copy'); toast('📋 Copiado!'); }
+}
+function openDetLink(){
+  var inp=document.getElementById('detLinkInput');
+  if(inp) window.open(inp.value.trim(),'_blank');
 }
 function addRegForClient(cid){
   const p=getPerfil(cid)||{};
@@ -1246,6 +1258,32 @@ function preencherCampos(cid) {
   if (selSt) selSt.value = p.status || 'ativo';
   var selBd = document.getElementById('ed_bandeira');
   if (selBd) selBd.value = p.bandeira || 'Verde';
+
+  // Emoji picker na edição
+  var emojiContainer = document.getElementById('ed_emoji');
+  if (emojiContainer && emojiContainer.parentNode) {
+    var pickerDiv = emojiContainer.parentNode.querySelector('.emoji-edit-picker');
+    if (!pickerDiv) {
+      pickerDiv = document.createElement('div');
+      pickerDiv.className = 'emoji-edit-picker';
+      pickerDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;margin-top:8px';
+      var emojis = ['👤','👨','👩','🧑','👦','👧','👴','👵','🏠','🏢','🏭','🏪','⚡','☀️','🌿','🔋','💡','🔌','🐙','🦑','🌊','🌞','🌍','💰','📊','🎯','🏆','⭐','❤️','💜'];
+      emojis.forEach(function(em) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = em;
+        btn.style.cssText = 'width:40px;height:40px;border-radius:11px;border:2px solid #E8EDF4;background:#F7F9FC;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s';
+        if (em === (p.emoji || '👤')) { btn.style.borderColor = '#1C6EFF'; btn.style.background = '#EEF3FF'; }
+        btn.onclick = function() {
+          pickerDiv.querySelectorAll('button').forEach(function(b){ b.style.borderColor='#E8EDF4'; b.style.background='#F7F9FC'; });
+          btn.style.borderColor = '#1C6EFF'; btn.style.background = '#EEF3FF';
+          emojiContainer.value = em;
+        };
+        pickerDiv.appendChild(btn);
+      });
+      emojiContainer.parentNode.appendChild(pickerDiv);
+    }
+  }
 }
 
 /* Salvar todos os campos de uma vez */
@@ -1618,12 +1656,58 @@ function saveCirc(cid,i){
   toast(`✅ Circuito ${i} salvo!`);
 }
 function novoCliente(){
-  const nome=prompt('Nome do novo cliente:');
-  if(!nome||!nome.trim()) return;
-  const id=uid();
-  setPerfil(id,perfilDefault(nome.trim()));
-  const cl=getClientes();cl.push({id,nome:nome.trim(),status:'ativo'});setClientes(cl);
-  toast('✅ Cliente criado!');curCid=id;switchTab('editar');
+  openMod(`
+    <div class="m-title">➕ Novo Cliente</div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">ID do Cliente (ex: A101)</label>
+      <input id="novo_id" placeholder="Ex: A101, B5, CLI42..." style="width:100%;padding:13px 15px;background:#fff;border:1.5px solid #DDE3EC;border-radius:12px;font-size:16px;font-weight:700;font-family:inherit;color:#0F1923;outline:none;-webkit-appearance:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">Nome do Cliente</label>
+      <input id="novo_nome" placeholder="Nome completo" style="width:100%;padding:13px 15px;background:#fff;border:1.5px solid #DDE3EC;border-radius:12px;font-size:16px;font-weight:600;font-family:inherit;color:#0F1923;outline:none;-webkit-appearance:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:700;color:#6B7A8D;display:block;margin-bottom:5px">Emoji / Avatar</label>
+      <div id="emojiPicker" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+      <input type="hidden" id="novo_emoji" value="👤">
+    </div>
+    <button class="btn btn-p" style="margin-bottom:8px" onclick="confirmarNovoCliente()">✅ Criar Cliente</button>
+    <button class="btn btn-g" onclick="closeMod()">Cancelar</button>
+  `);
+  // Render emoji picker
+  var emojis=['👤','👨','👩','🧑','👦','👧','👴','👵','🏠','🏢','🏭','🏪','⚡','☀️','🌿','🔋','💡','🔌','🐙','🦑','🌊','🌞','🌍','💰','📊','🎯','🏆','⭐','❤️','💜'];
+  var picker=document.getElementById('emojiPicker');
+  if(picker){
+    picker.innerHTML=emojis.map(function(e){
+      return '<button onclick="selectEmoji(this,\''+e+'\')" style="width:42px;height:42px;border-radius:12px;border:2px solid #E8EDF4;background:#F7F9FC;font-size:22px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center" data-emoji="'+e+'">'+e+'</button>';
+    }).join('');
+    // Select first by default
+    if(picker.firstChild) picker.firstChild.style.borderColor='#1C6EFF';
+  }
+}
+function selectEmoji(btn, emoji){
+  document.querySelectorAll('#emojiPicker button').forEach(function(b){b.style.borderColor='#E8EDF4';b.style.background='#F7F9FC';});
+  btn.style.borderColor='#1C6EFF';btn.style.background='#EEF3FF';
+  document.getElementById('novo_emoji').value=emoji;
+}
+function confirmarNovoCliente(){
+  var id=(document.getElementById('novo_id').value||'').trim();
+  var nome=(document.getElementById('novo_nome').value||'').trim();
+  var emoji=document.getElementById('novo_emoji').value||'👤';
+  if(!id){toast('⚠️ Informe um ID.');return;}
+  if(!nome){toast('⚠️ Informe o nome.');return;}
+  // Verifica se ID já existe
+  var cl=getClientes();
+  if(cl.find(function(c){return c.id===id;})){toast('⚠️ ID "'+id+'" já existe.');return;}
+  var p=perfilDefault(nome);
+  p.emoji=emoji;
+  setPerfil(id,p);
+  cl.push({id:id,nome:nome,status:'ativo'});
+  setClientes(cl);
+  closeMod();
+  toast('✅ Cliente '+id+' criado!');
+  curCid=id;
+  switchTab('editar');
 }
 function delCliente(cid){
   const p=getPerfil(cid)||{};
@@ -1926,22 +2010,41 @@ function splashTapped() {
 ══════════════════════════════════════════════ */
 function seedDemo(){
   if(getClientes().length) return;
-  const cl=[{id:'cli1',nome:'Guilherme Pereira',status:'ativo'},{id:'cli2',nome:'Ana Costa',status:'ativo'},{id:'cli3',nome:'Carlos Mendes',status:'pendente'}];
-  const perfis={
-    cli1:{...perfilDefault('Guilherme Pereira'),emoji:'👨',cor:'#1C6EFF',distribuidora:'ENEL',nrMedidor:'0438221',nrContrato:'12345678',tarifaFP:'0,65',tarifaInt:'0,87',tarifaPonta:'1,34',tarifaPadrao:'0.653',bandeira:'Verde',vencimentoDia:'10',meta:500},
-    cli2:{...perfilDefault('Ana Costa'),emoji:'👩',cor:'#10B981',distribuidora:'CEMIG',nrMedidor:'0987654',nrContrato:'87654321',tarifaFP:'0,72',tarifaInt:'0,95',tarifaPonta:'1,48',tarifaPadrao:'0.720',bandeira:'Verde',vencimentoDia:'15',meta:400,circ1Nome:'Ar-Condicionado',circ1Loc:'Sala',circ2Nome:'Geladeira',circ2Loc:'Cozinha',circ3Nome:'Escritório',circ3Loc:'Home office'},
-    cli3:{...perfilDefault('Carlos Mendes'),emoji:'🧑',cor:'#F59E0B',distribuidora:'CPFL',nrMedidor:'0555333',tarifaPadrao:'0.710',bandeira:'Amarela',status:'pendente',meta:350},
-  };
-  const regs={
-    cli1:[{id:'r1a',mes:'2025-04',producao:'420',consumo:'247',tarifa:'0.653',taxa:'50',parcela:'0',obs:'Mês ensolarado',saldo:'173',economia:'274.26',saldoFin:'224.26',autoSuf:'170.04',criado:new Date().toISOString()},{id:'r1b',mes:'2025-03',producao:'380',consumo:'290',tarifa:'0.653',taxa:'50',parcela:'0',obs:'',saldo:'90',economia:'248.14',saldoFin:'198.14',autoSuf:'131.03',criado:new Date().toISOString()},{id:'r1c',mes:'2025-02',producao:'310',consumo:'320',tarifa:'0.653',taxa:'50',parcela:'0',obs:'',saldo:'-10',economia:'202.43',saldoFin:'152.43',autoSuf:'96.88',criado:new Date().toISOString()}],
-    cli2:[{id:'r2a',mes:'2025-04',producao:'510',consumo:'380',tarifa:'0.720',taxa:'55',parcela:'300',obs:'Verão quente',saldo:'130',economia:'367.2',saldoFin:'12.2',autoSuf:'134.21',criado:new Date().toISOString()},{id:'r2b',mes:'2025-03',producao:'460',consumo:'350',tarifa:'0.720',taxa:'55',parcela:'300',obs:'',saldo:'110',economia:'331.2',saldoFin:'-23.8',autoSuf:'131.43',criado:new Date().toISOString()}],
-    cli3:[]
-  };
+  var emojis=['👨','👩','🧑','👦','👧','👴','👵','🏠','🏢','🏭'];
+  var nomes=['Cliente A','Cliente B','Cliente C','Cliente D','Cliente E','Cliente F','Cliente G','Cliente H','Cliente I','Cliente J'];
+  var cl=[];
+  for(var i=1;i<=100;i++){
+    var id='A'+i;
+    var nome=nomes[(i-1)%10]+' '+String(i).padStart(3,'0');
+    var emoji=emojis[(i-1)%emojis.length];
+    var cores=['#1C6EFF','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#84CC16','#F97316','#6366F1'];
+    var cor=cores[(i-1)%cores.length];
+    var status=i<=90?'ativo':(i<=95?'pendente':'inativo');
+    cl.push({id:id,nome:nome,status:status});
+    var p=perfilDefault(nome);
+    p.emoji=emoji; p.cor=cor; p.status=status;
+    p.distribuidora=['Neoenergia','ENEL','CEMIG','CPFL','Light','Equatorial','Energisa','Coelba','CELPE','Elektro'][(i-1)%10];
+    p.nrMedidor=String(3220000000+i);
+    p.nrContrato=String(7050000000+i);
+    p.meta=Math.floor(200+Math.random()*500);
+    setPerfil(id,p);
+    // Registros demo para os 3 primeiros clientes
+    if(i<=3){
+      var regs=[];
+      for(var m=1;m<=6;m++){
+        var mes='2025-'+String(m).padStart(2,'0');
+        var prod=Math.floor(250+Math.random()*300);
+        var cons=Math.floor(200+Math.random()*250);
+        var tar=0.65;
+        regs.push({id:uid(),mes:mes,producao:String(prod),consumo:String(cons),tarifa:String(tar),taxa:'50',parcela:'0',obs:'',
+          saldo:String(prod-cons),economia:String((prod*tar).toFixed(2)),saldoFin:String((prod*tar-50).toFixed(2)),
+          autoSuf:String((cons>0?(prod/cons)*100:0).toFixed(2)),criado:new Date().toISOString()});
+      }
+      setRegs(id,regs);
+    }
+  }
   setClientes(cl);
-  Object.entries(perfis).forEach(([id,p])=>setPerfil(id,p));
-  Object.entries(regs).forEach(([id,r])=>setRegs(id,r));
 }
-
 /* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
